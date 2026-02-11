@@ -9,7 +9,7 @@ import { notifyError, notifySuccess } from "../utils/notify";
 
 function Signup() {
   const navigate = useNavigate();
-  const { signup, currentUser, loginWithGoogle } = useAuth();
+  const { signup, currentUser, loginWithGoogle, sendVerificationEmail } = useAuth();
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -22,6 +22,7 @@ function Signup() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [verificationSent, setVerificationSent] = useState(false);
 
   React.useEffect(() => {
     if (currentUser) {
@@ -85,8 +86,19 @@ function Signup() {
 
       try {
         await signup(formData.email, formData.password, formData.fullName);
-          notifySuccess("Signed up successfully");
-       setTimeout(() => navigate("/dashboard"), 1500);
+        
+        // Send verification email
+        try {
+          await sendVerificationEmail();
+          setVerificationSent(true);
+          notifySuccess("Account created! Verification email sent. Check your inbox/spam folder.");
+          console.log("✅ Verification email sent successfully to:", formData.email);
+        } catch (verifyError) {
+          console.error("❌ Verification email error:", verifyError);
+          notifyError("Account created but failed to send verification email.");
+        }
+        
+        setTimeout(() => navigate("/dashboard"), 2000);
       } catch (error) {
         console.error("Signup error:", error);
 
@@ -151,6 +163,22 @@ function Signup() {
             Join <span className="text-gradient-purple">CryptoHub</span> and start tracking today
           </p>
         </div>
+
+        {verificationSent && (
+          <div style={{
+            padding: '12px',
+            marginBottom: '20px',
+            backgroundColor: 'rgba(34, 197, 94, 0.1)',
+            border: '1px solid rgba(34, 197, 94, 0.3)',
+            borderRadius: '8px',
+            color: '#22c55e',
+            fontSize: '14px',
+            textAlign: 'center'
+          }}>
+            <FiMail style={{ display: 'inline', marginRight: '8px', verticalAlign: 'middle' }} />
+            Verification email sent! Please verify within 24 hours or your account will be deleted.
+          </div>
+        )}
 
         <form className="auth-form" onSubmit={handleSubmit}>
           <div className="form-group">

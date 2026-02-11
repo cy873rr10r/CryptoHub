@@ -75,7 +75,7 @@ function Login() {
         if (error.code === "auth/invalid-credential") {
           errorMessage = "Invalid email or password";
         } else if (error.code === "auth/user-not-found") {
-          errorMessage = "No account found with this email";
+          errorMessage = "No account found. Account may have been deleted due to lack of verification within 24 hours";
         } else if (error.code === "auth/wrong-password") {
           errorMessage = "Incorrect password";
         } else if (error.code === "auth/too-many-requests") {

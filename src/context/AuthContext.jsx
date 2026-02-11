@@ -19,8 +19,10 @@ import {
   EmailAuthProvider,
   updatePassword,
   sendPasswordResetEmail,
+  sendEmailVerification,
+  deleteUser,
 } from "firebase/auth";
-import { doc, setDoc, getDoc, serverTimestamp } from "firebase/firestore";
+import { doc, setDoc, getDoc, serverTimestamp, deleteDoc } from "firebase/firestore";
 import { auth, db, googleProvider, isFirebaseConfigured } from "../firebase";
 
 const AuthContext = createContext({});
@@ -175,6 +177,16 @@ export const AuthProvider = ({ children }) => {
     await sendPasswordResetEmail(auth, email);
   }, []);
 
+  //   send verification email function
+  const sendVerificationEmail = useCallback(async () => {
+    if (!isFirebaseConfigured() || !auth || !auth.currentUser) {
+      throw new Error(
+        "Firebase is not configured or no user is logged in."
+      );
+    }
+    await sendEmailVerification(auth.currentUser);
+  }, []);
+
   //   check if user signed in with email/password
   const isEmailProvider = useCallback(() => {
     if (!auth?.currentUser) return false;
@@ -182,6 +194,43 @@ export const AuthProvider = ({ children }) => {
     // check if user has email/password as a  provider
     return auth.currentUser.providerData.some(
       (provider) => provider.providerId === 'password');
+  }, []);
+
+  //   delete unverified account if expired (> 24 hours)
+  const deleteExpiredUnverifiedAccount = useCallback(async (user, userData) => {
+    try {
+      // Only check email/password accounts
+      const isEmailUser = user.providerData.some(
+        (provider) => provider.providerId === 'password'
+      );
+      
+      if (!isEmailUser || user.emailVerified) {
+        return false; // Account is verified or not email-based
+      }
+
+      // Check if account is older than 24 hours
+      const createdAt = userData?.createdAt?.toDate() || user.metadata.creationTime;
+      const accountAge = Date.now() - new Date(createdAt).getTime();
+      const twentyFourHours = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+
+      if (accountAge > twentyFourHours) {
+        console.log('Deleting expired unverified account:', user.email);
+        
+        // Delete Firestore documents
+        await deleteDoc(doc(db, "users", user.uid));
+        await deleteDoc(doc(db, "leaderboard", user.uid));
+        
+        // Delete auth account
+        await deleteUser(user);
+        
+        return true; // Account was deleted
+      }
+      
+      return false; // Account not expired yet
+    } catch (error) {
+      console.error('Error deleting expired account:', error);
+      return false;
+    }
   }, []);
 
   //   Monitor auth state changes
@@ -198,6 +247,15 @@ export const AuthProvider = ({ children }) => {
           const userDoc = await getDoc(doc(db, "users", user.uid));
           if (userDoc.exists()) {
             const userData = userDoc.data();
+            
+            // Check if account should be deleted (unverified > 24 hours)
+            const wasDeleted = await deleteExpiredUnverifiedAccount(user, userData);
+            if (wasDeleted) {
+              setCurrentUser(null);
+              setLoading(false);
+              return;
+            }
+            
             console.log("Fetched user data from Firestore:", userData);
             setCurrentUser({
               ...user,
@@ -235,7 +293,7 @@ export const AuthProvider = ({ children }) => {
       setLoading(false);
     });
     return unsubscribe;
-  }, []);
+  }, [deleteExpiredUnverifiedAccount]);
 
   const value = useMemo(
     () => ({
@@ -248,8 +306,9 @@ export const AuthProvider = ({ children }) => {
       ChangePassword,
       resetPassword,
       isEmailProvider,
+      sendVerificationEmail,
     }),
-    [currentUser, loading, signup, login, loginWithGoogle, logout, ChangePassword, resetPassword, isEmailProvider]
+    [currentUser, loading, signup, login, loginWithGoogle, logout, ChangePassword, resetPassword, isEmailProvider, sendVerificationEmail]
   );
 
   return (

@@ -105,7 +105,7 @@ const App = () => {
                 {/* Dashboard Layout with nested routes - all share the same sidebar */}
                 <Route
                   element={
-                    <PrivateRoute>
+                    <PrivateRoute requireEmailVerification={true}>
                       <DashboardLayout />
                     </PrivateRoute>
                   }
