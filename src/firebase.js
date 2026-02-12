@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider } from "firebase/auth";
+import { getAuth, GoogleAuthProvider, setPersistence, browserLocalPersistence } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 // Check if Firebase credentials are configured
@@ -27,6 +27,12 @@ if (isFirebaseConfigured()) {
   try {
     app = initializeApp(firebaseConfig);
     auth = getAuth(app);
+    
+    // Set default persistence to local storage for login persistence across page refreshes
+    setPersistence(auth, browserLocalPersistence).catch((error) => {
+      console.warn('Failed to set auth persistence:', error);
+    });
+    
     db = getFirestore(app);
     googleProvider = new GoogleAuthProvider();
   } catch (error) {

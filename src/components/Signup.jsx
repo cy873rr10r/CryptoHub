@@ -85,17 +85,18 @@ function Signup() {
       setErrors({});
 
       try {
-        await signup(formData.email, formData.password, formData.fullName);
+        const userCredential = await signup(formData.email, formData.password, formData.fullName);
+        console.log('🔐 Signup completed for:', formData.email);
         
-        // Send verification email
+        // Send verification email with user object
         try {
-          await sendVerificationEmail();
+          await sendVerificationEmail(userCredential.user);
           setVerificationSent(true);
           notifySuccess("Account created! Verification email sent. Check your inbox/spam folder.");
-          console.log("✅ Verification email sent successfully to:", formData.email);
         } catch (verifyError) {
           console.error("❌ Verification email error:", verifyError);
-          notifyError("Account created but failed to send verification email.");
+          console.error("Error details:", verifyError.message, verifyError.code);
+          notifyError("Account created but failed to send verification email: " + verifyError.message);
         }
         
         setTimeout(() => navigate("/dashboard"), 2000);

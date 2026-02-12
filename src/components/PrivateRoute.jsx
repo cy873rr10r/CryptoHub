@@ -1,9 +1,27 @@
-import React from "react";
-import { Navigate } from "react-router-dom";
+import React, { useState } from "react";
+import { Navigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 const PrivateRoute = ({ children, requireEmailVerification = false }) => {
-  const { currentUser, loading } = useAuth();
+  const { currentUser, loading, sendVerificationEmail } = useAuth();
+  const [resending, setResending] = useState(false);
+  const [resent, setResent] = useState(false);
+  const [resendError, setResendError] = useState(null);
+
+  const handleResend = async () => {
+    setResendError(null);
+    setResent(false);
+    setResending(true);
+    try {
+      await sendVerificationEmail();
+      setResent(true);
+    } catch (err) {
+      console.error('Resend verification failed:', err);
+      setResendError(err.message || 'Failed to resend verification email.');
+    } finally {
+      setResending(false);
+    }
+  };
 
   // Show loading spinner while checking auth
   if (loading) {
@@ -61,6 +79,51 @@ const PrivateRoute = ({ children, requireEmailVerification = false }) => {
         <p>Please verify your email address to access this feature.</p>
         <p>Check your inbox for the verification link.</p>
         <p>Verification period is 24 hours.</p>
+        {resendError && (
+          <p style={{ color: '#f87171', marginTop: '8px' }}>
+            {resendError}
+          </p>
+        )}
+        {resent && !resendError && (
+          <p style={{ color: '#22c55e', marginTop: '8px' }}>
+            Verification email resent. Please check your inbox or spam.
+          </p>
+        )}
+        <button
+          onClick={handleResend}
+          disabled={resending}
+          style={{
+            marginTop: '16px',
+            padding: '12px 24px',
+            backgroundColor: resending ? '#6b7280' : '#8b5cf6',
+            color: '#fff',
+            border: 'none',
+            borderRadius: '8px',
+            fontWeight: '600',
+            cursor: resending ? 'not-allowed' : 'pointer',
+            transition: 'all 0.2s ease'
+          }}
+        >
+          {resending ? 'Resending...' : 'Resend Verification Email'}
+        </button>
+        <Link 
+          to="/"
+          style={{
+            marginTop: '20px',
+            padding: '12px 24px',
+            backgroundColor: '#8b5cf6',
+            color: '#fff',
+            textDecoration: 'none',
+            borderRadius: '8px',
+            fontWeight: '600',
+            transition: 'all 0.3s ease',
+            display: 'inline-block'
+          }}
+          onMouseEnter={(e) => e.target.style.backgroundColor = '#7c3aed'}
+          onMouseLeave={(e) => e.target.style.backgroundColor = '#8b5cf6'}
+        >
+          Go to Home Page
+        </Link>
       </div>
     );
   }

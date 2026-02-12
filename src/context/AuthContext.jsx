@@ -14,7 +14,7 @@ import {
   signOut,
   onAuthStateChanged,
   setPersistence,
-  browserSessionPersistence,
+  browserLocalPersistence,
   reauthenticateWithCredential,
   EmailAuthProvider,
   updatePassword,
@@ -88,6 +88,7 @@ export const AuthProvider = ({ children }) => {
       lastUpdated: serverTimestamp(),
     });
 
+    console.log('✅ User account created:', user.email);
     return userCredential;
   }, []);
 
@@ -98,7 +99,7 @@ export const AuthProvider = ({ children }) => {
         "Firebase is not configured. Please add Firebase credentials to use authentication."
       );
     }
-    await setPersistence(auth, browserSessionPersistence);
+    await setPersistence(auth, browserLocalPersistence);
     const userCredential = await signInWithEmailAndPassword(
       auth,
       email,
@@ -114,7 +115,7 @@ export const AuthProvider = ({ children }) => {
         "Firebase is not configured. Please add Firebase credentials to use authentication."
       );
     }
-    await setPersistence(auth, browserSessionPersistence);
+    await setPersistence(auth, browserLocalPersistence);
     const userCredential = await signInWithPopup(auth, googleProvider);
     const user = userCredential.user;
 
@@ -178,13 +179,21 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   //   send verification email function
-  const sendVerificationEmail = useCallback(async () => {
-    if (!isFirebaseConfigured() || !auth || !auth.currentUser) {
+  const sendVerificationEmail = useCallback(async (user = null) => {
+    if (!isFirebaseConfigured() || !auth) {
       throw new Error(
-        "Firebase is not configured or no user is logged in."
+        "Firebase is not configured."
       );
     }
-    await sendEmailVerification(auth.currentUser);
+    
+    const userToVerify = user || auth.currentUser;
+    if (!userToVerify) {
+      throw new Error("No user is logged in.");
+    }
+    
+    console.log('📧 Sending verification email to:', userToVerify.email);
+    await sendEmailVerification(userToVerify);
+    console.log('✅ Verification email sent successfully');
   }, []);
 
   //   check if user signed in with email/password
