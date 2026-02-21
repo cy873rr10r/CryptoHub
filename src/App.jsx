@@ -1,4 +1,5 @@
-import React, { useEffect, useContext } from "react";
+import React, { useEffect, useContext,useRef } from "react";
+import Lenis from "@studio-freight/lenis";
 import Navbar from "@/components/Navbar";
 import { Routes, Route, useLocation } from "react-router-dom";
 import Home from "@/pages/Home/Home";
@@ -35,6 +36,31 @@ import FAQ from "./components/FAQ";
 import PageNotFound from "./components/PageNotFound";
 
 const App = () => {
+
+  const lenisRef = useRef(null)
+  useEffect(() => {
+    const lenis = new Lenis({
+      smoothWheel: true,
+      lerp: 0.08,
+      wheelMultiplier: 1,
+      smoothTouch: false,
+    });
+
+    lenisRef.current = lenis;
+
+    function raf(time) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+
+    requestAnimationFrame(raf);
+
+    return () => {
+      lenis.destroy();
+      lenisRef.current = null;
+    };
+  }, []);
+
   const { isLoading } = useContext(CoinContext);
   const location = useLocation();
   const isDashboard =
@@ -42,6 +68,9 @@ const App = () => {
     location.pathname === "/leaderboard" ||
     location.pathname === "/market-overview" ||
     location.pathname === "/change-password" ;
+
+  const authRoutes = ["/login", "/signup", "/forgot-password"];
+  const isAuthPage = authRoutes.includes(location.pathname);
 
   useEffect(() => {
     AOS.init({
@@ -135,9 +164,9 @@ const App = () => {
                 <Route path="/cookies" element={<CookiePolicy />} />
               </Routes>
             </div>
-            {!isDashboard && <Footer />}
+           {!isDashboard && !isAuthPage && <Footer />}
           </div>
-          <ScrollToTop />
+          <ScrollToTop  lenis={lenisRef.current} />
         </AuthProvider>
       </ThemeProvider>
     </>

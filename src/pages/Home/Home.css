@@ -1169,7 +1169,7 @@
         grid-template-columns: 0.5fr 2fr 1.5fr 1.2fr 1.5fr;
         padding: 12px 10px;
         gap: 10px;
-        min-width: 600px;
+        min-width: 700px;
     }
 
     .coin-icon {
@@ -1393,7 +1393,27 @@
 }
 
 .market-actions {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
+
+@media (max-width: 768px) {
+.market-actions {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    gap: 12px;
+    justify-content: space-between;
+}
+}
+
+.glass-panel-home{
+        background: rgba(255, 255, 255, 0.12);
+        backdrop-filter: blur(24px);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 1.5rem;
+        position: relative;
+        transition: all 0.3s ease;
+}
+

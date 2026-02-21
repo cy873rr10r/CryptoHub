@@ -1,10 +1,11 @@
-import React from 'react'
+import React, {useState} from 'react'
 import { useContext } from "react";
 import { CoinContext } from "../context/CoinContext";
 import "./MarketFilters.css";
 
 const MarketFilters = () => {
     const {selectedFilters, setSelectedFilters} = useContext(CoinContext);
+    const [open, setOpen] = useState(false);
 
    const toggleFilter = (filter) => {
   // Clicking "all"
@@ -37,31 +38,36 @@ const MarketFilters = () => {
 };
 
   return (
-    <div className="market-filters">
-        <span className='filter-label' >Filters:</span>
-        <button className={`filter-btn  
-            ${selectedFilters.includes("all") ? "active" : ""
-            }`} 
-            onClick={() => toggleFilter("all")}>
-             All Coins
-        </button>
-                <button
-        className={`filter-btn ${
-            selectedFilters.includes("trending") ? "active" : ""
-        }`}
-        onClick={() => toggleFilter("trending")}
+    <div className="market-filters-wrapper">
+      {/* Mobile toggle button */}
+      <button className="filter-toggle" onClick={() => setOpen(!open)}>
+         {open ? "✕ Filters" : "☰ Filters"}
+      </button>
+
+      <div className={`market-filters ${open ? "open" : "closed"}`}>
+        <span className="filter-label">Filters:</span>
+
+        <button
+          className={`filter-btn ${selectedFilters.includes("all") ? "active" : ""}`}
+          onClick={() => toggleFilter("all")}
         >
-        Trending
+          All Coins
         </button>
 
         <button
-        className={`filter-btn ${
-            selectedFilters.includes("top_gainers") ? "active" : ""
-        }`}
-        onClick={() => toggleFilter("top_gainers")}
+          className={`filter-btn ${selectedFilters.includes("trending") ? "active" : ""}`}
+          onClick={() => toggleFilter("trending")}
         >
-        Top Gainers
+          Trending
         </button>
+
+        <button
+          className={`filter-btn ${selectedFilters.includes("top_gainers") ? "active" : ""}`}
+          onClick={() => toggleFilter("top_gainers")}
+        >
+          Top Gainers
+        </button>
+      </div>
     </div>
   )
 }

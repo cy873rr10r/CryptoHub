@@ -177,7 +177,7 @@ const Home = () => {
           </div>
         </div>
 
-        <div className="table-container glass-panel">
+        <div className="table-container glass-panel-home">
           <div className="table-header">
             <div className="col-rank">#</div>
             <div className="col-name">Asset</div>

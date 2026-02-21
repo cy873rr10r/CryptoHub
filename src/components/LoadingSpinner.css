@@ -10,6 +10,7 @@
   align-items: center;
   z-index: 9999;
   background: transparent; /* No background overlay */
+  pointer-events: none; /* Allow clicks through the overlay */
 }
 
 .spinner-card {
@@ -25,6 +26,7 @@
   justify-content: center;
   min-width: 200px;
   animation: slideUp 0.3s ease-out;
+  pointer-events: auto; /* Spinner card itself can be clicked */
 }
 
 @keyframes slideUp {

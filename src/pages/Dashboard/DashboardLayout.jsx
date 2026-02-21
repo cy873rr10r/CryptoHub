@@ -69,7 +69,7 @@ const DashboardLayout = () => {
                 <div className="flex flex-col h-full p-5">
                     <div className="flex items-center justify-between mb-8">
                         {sidebarOpen && (
-                            <Link to="/" className="flex items-center gap-3 no-underline cursor-pointer hover:opacity-90" style={{ textDecoration: 'none' }}>
+                            <Link to="/" className="flex items-center gap-3 cursor-pointer hover:opacity-90" style={{ textDecoration: 'none' }}>
                                 <img
                                     src="/crypto-logo.png"
                                     alt="CryptoHub"

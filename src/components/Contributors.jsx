@@ -1,37 +1,50 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import "./contributors.css"; 
 
 const OWNER = "KaranUnique";
 const REPO = "CryptoHub";
+const GITHUB_API_BASE = `https://api.github.com/repos/${OWNER}/${REPO}`;
+const PER_PAGE = 100;
+
+// Precompiled regex for level extraction (avoid re-creating per call)
+const LEVEL_REGEX = /level[\s-]*(1|2|3)/;
 
 // Project Admin Config
 const PROJECT_ADMIN = {
   username: "KaranUnique",
   repo: "CryptoHub",
-  repoUrl: "https://github.com/KaranUnique/CryptoHub",
-  githubUrl: "https://github.com/KaranUnique",
-  avatarUrl: `https://avatars.githubusercontent.com/KaranUnique?v=4&s=200`, 
+  repoUrl: `https://github.com/${OWNER}/${REPO}`,
+  githubUrl: `https://github.com/${OWNER}`,
+  avatarUrl: `https://avatars.githubusercontent.com/${OWNER}?v=4&s=200`, 
   description: "Project Creator & Lead Maintainer"
 };
 
 // Points per level
-const LEVEL_POINTS = {
-  1: 2,
-  2: 5,
-  3: 11,
+const LEVEL_POINTS = { 1: 2, 2: 5, 3: 11 };
+
+// Rank thresholds (sorted descending for early exit)
+const RANK_THRESHOLDS = [
+  { min: 30, label: "Gold 🥇" },
+  { min: 20, label: "Silver 🥈" },
+  { min: 10, label: "Bronze 🥉" },
+];
+
+const RANK_MAP = {
+  gold: "Gold",
+  silver: "Silver",
+  bronze: "Bronze",
+  contributor: "Contributor",
 };
 
 const getLevelFromPr = (pr) => {
   const title = pr.title?.toLowerCase() || "";
-  const titleMatch = title.match(/level[\s-]*(1|2|3)/);
-  if (titleMatch) {
-    return Number(titleMatch[1]);
-  }
+  const titleMatch = title.match(LEVEL_REGEX);
+  if (titleMatch) return Number(titleMatch[1]);
 
   if (Array.isArray(pr.labels)) {
     for (const label of pr.labels) {
       const name = (label?.name || "").toLowerCase();
-      const labelMatch = name.match(/level[\s-]*(1|2|3)/);
+      const labelMatch = name.match(LEVEL_REGEX);
       if (labelMatch) return Number(labelMatch[1]);
     }
   }
@@ -40,10 +53,126 @@ const getLevelFromPr = (pr) => {
 };
 
 const getRankFromPoints = (points) => {
-  if (points >= 30) return "Gold 🥇";
-  if (points >= 20) return "Silver 🥈";
-  if (points >= 10) return "Bronze 🥉";
+  for (const { min, label } of RANK_THRESHOLDS) {
+    if (points >= min) return label;
+  }
   return "Contributor";
+};
+
+// Precompute rank CSS class from rank string (memoized outside render)
+const rankClassCache = new Map();
+const getRankClass = (rank) => {
+  if (rankClassCache.has(rank)) return rankClassCache.get(rank);
+  const cls = rank.toLowerCase().replace(/ /g, "-").replace(/[🥇🥈🥉]/g, "").replace(/-$/, "");
+  rankClassCache.set(rank, cls);
+  return cls;
+};
+
+// Debounce hook
+const useDebounce = (value, delay) => {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedValue(value), delay);
+    return () => clearTimeout(timer);
+  }, [value, delay]);
+  return debouncedValue;
+};
+
+// Extracted ContributorCard to avoid re-renders of sibling cards
+const ContributorCard = React.memo(({ contributor, onOpenModal, onOpenGitHub }) => {
+  const rankClass = getRankClass(contributor.rank);
+  return (
+    <article className={`contributor-card contributor-rank-${rankClass}`}>
+      <div className="contributor-header">
+        <div className="contributor-avatar-wrapper">
+          <img
+            src={contributor.avatar_url}
+            alt={contributor.username}
+            className="contributor-avatar"
+            loading="lazy"
+            width="90"
+            height="90"
+          />
+        </div>
+        <div className="contributor-basic-info">
+          <h2 className="contributor-username">{contributor.username}</h2>
+          <p className={`contributor-rank contributor-rank-${rankClass}`}>
+            {contributor.rank}
+          </p>
+        </div>
+      </div>
+
+      <div className="contributor-stats">
+        <div className="contributor-stat-item">
+          <span className="contributor-stat-label">Points</span>
+          <span className="contributor-stat-value">{contributor.totalPoints}</span>
+        </div>
+        <div className="contributor-stat-item">
+          <span className="contributor-stat-label">Merged PRs</span>
+          <span className="contributor-stat-value">{contributor.totalPRs}</span>
+        </div>
+      </div>
+
+      <div className="contributor-actions">
+        <button
+          className="btn btn-primary btn-view-prs"
+          onClick={() => onOpenModal(contributor)}
+        >
+          View PR details
+        </button>
+        <button
+          className="btn btn-outline btn-view-github"
+          onClick={() => onOpenGitHub(contributor.html_url)}
+        >
+          GitHub Profile →
+        </button>
+      </div>
+    </article>
+  );
+});
+
+ContributorCard.displayName = "ContributorCard";
+
+// Process raw PR data into contributor map (pure function, no side effects)
+const buildContributors = (mergedPrs) => {
+  const map = {};
+
+  for (const pr of mergedPrs) {
+    const user = pr.user;
+    if (!user) continue;
+
+    const { login: username, avatar_url, html_url } = user;
+    const level = getLevelFromPr(pr);
+    const points = level ? LEVEL_POINTS[level] || 0 : 0;
+
+    if (!map[username]) {
+      map[username] = {
+        username,
+        avatar_url,
+        html_url,
+        totalPoints: 0,
+        totalPRs: 0,
+        prs: [],
+      };
+    }
+
+    map[username].totalPRs += 1;
+    map[username].totalPoints += points;
+    map[username].prs.push({
+      id: pr.id,
+      number: pr.number,
+      title: pr.title,
+      html_url: pr.html_url,
+      merged_at: pr.merged_at,
+      level,
+      points,
+    });
+  }
+
+  return Object.values(map).map((c) => ({
+    ...c,
+    rank: getRankFromPoints(c.totalPoints),
+  }));
 };
 
 const Contributors = () => {
@@ -56,24 +185,29 @@ const Contributors = () => {
   const [selectedContributor, setSelectedContributor] = useState(null);
   const [showModal, setShowModal] = useState(false);
 
-  //  PUBLIC FETCH - NO TOKEN NEEDED
+  // AbortController ref for cleanup on unmount
+  const abortRef = useRef(null);
+
+  // Debounce search to avoid filtering on every keystroke
+  const debouncedSearch = useDebounce(search, 250);
+
+  // Fetch with AbortController support
   useEffect(() => {
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     const fetchAllMergedPRs = async () => {
       setLoading(true);
       setError("");
 
       try {
         let page = 1;
-        const perPage = 100;
         let mergedPrs = [];
-        let keepFetching = true;
 
-        // Fetch all pages of closed PRs (public GitHub API)
-        while (keepFetching) {
-          const url = `https://api.github.com/repos/${OWNER}/${REPO}/pulls?state=closed&per_page=${perPage}&page=${page}`;
-          
+        while (true) {
+          const url = `${GITHUB_API_BASE}/pulls?state=closed&per_page=${PER_PAGE}&page=${page}`;
           const response = await fetch(url, {
-            method: 'GET',
+            signal: controller.signal,
             headers: {
               'Accept': 'application/vnd.github+json',
               'User-Agent': 'CryptoHub-Contributors-App',
@@ -88,58 +222,13 @@ const Contributors = () => {
           const merged = data.filter((pr) => pr.merged_at);
           mergedPrs = mergedPrs.concat(merged);
 
-          if (data.length < perPage) {
-            keepFetching = false;
-          } else {
-            page += 1;
-          }
+          if (data.length < PER_PAGE) break;
+          page += 1;
         }
 
-        const contributorsMap = {};
-
-        mergedPrs.forEach((pr) => {
-          const user = pr.user;
-          if (!user) return;
-
-          const username = user.login;
-          const avatar_url = user.avatar_url;
-          const html_url = user.html_url;
-
-          const level = getLevelFromPr(pr);
-          const points = level ? LEVEL_POINTS[level] || 0 : 0;
-
-          if (!contributorsMap[username]) {
-            contributorsMap[username] = {
-              username,
-              avatar_url,
-              html_url,
-              totalPoints: 0,
-              totalPRs: 0,
-              rank: "Contributor",
-              prs: [],
-            };
-          }
-
-          contributorsMap[username].totalPRs += 1;
-          contributorsMap[username].totalPoints += points;
-          contributorsMap[username].prs.push({
-            id: pr.id,
-            number: pr.number,
-            title: pr.title,
-            html_url: pr.html_url,
-            merged_at: pr.merged_at,
-            level,
-            points,
-          });
-        });
-
-        const contributorsArr = Object.values(contributorsMap).map((c) => ({
-          ...c,
-          rank: getRankFromPoints(c.totalPoints),
-        }));
-
-        setContributors(contributorsArr);
+        setContributors(buildContributors(mergedPrs));
       } catch (err) {
+        if (err.name === "AbortError") return; // Unmounted, ignore
         console.error("Fetch error:", err);
         setError(`Failed to load data: ${err.message}`);
       } finally {
@@ -148,28 +237,38 @@ const Contributors = () => {
     };
 
     fetchAllMergedPRs();
+
+    return () => controller.abort(); // Cleanup on unmount
   }, []);
 
-  const filteredContributors = useMemo(() => {
-    let result = [...contributors];
+  // Memoize aggregate stats to avoid recalculation in render
+  const stats = useMemo(() => {
+    let totalPRs = 0;
+    let totalPoints = 0;
+    for (const c of contributors) {
+      totalPRs += c.totalPRs;
+      totalPoints += c.totalPoints;
+    }
+    return { count: contributors.length, totalPRs, totalPoints };
+  }, [contributors]);
 
-    if (search.trim()) {
-      const q = search.trim().toLowerCase();
-      result = result.filter((c) =>
-        c.username.toLowerCase().includes(q)
-      );
+  const filteredContributors = useMemo(() => {
+    let result = contributors;
+
+    if (debouncedSearch.trim()) {
+      const q = debouncedSearch.trim().toLowerCase();
+      result = result.filter((c) => c.username.toLowerCase().includes(q));
     }
 
     if (selectedRankFilter !== "all") {
-      const rankMap = {
-        gold: "Gold",
-        silver: "Silver",
-        bronze: "Bronze",
-        contributor: "Contributor",
-      };
-      const selectedRank = rankMap[selectedRankFilter];
-      result = result.filter((c) => c.rank === selectedRank);
+      const selectedRank = RANK_MAP[selectedRankFilter];
+      if (selectedRank) {
+        result = result.filter((c) => c.rank.startsWith(selectedRank));
+      }
     }
+
+    // Only copy when we need to sort (sort mutates)
+    result = [...result];
 
     if (sortBy === "most_points") {
       result.sort((a, b) => b.totalPoints - a.totalPoints);
@@ -178,26 +277,26 @@ const Contributors = () => {
     }
 
     return result;
-  }, [contributors, search, selectedRankFilter, sortBy]);
+  }, [contributors, debouncedSearch, selectedRankFilter, sortBy]);
 
-  const handleOpenModal = (contributor) => {
+  const handleOpenModal = useCallback((contributor) => {
     setSelectedContributor(contributor);
     setShowModal(true);
-  };
+  }, []);
 
-  const handleCloseModal = () => {
+  const handleCloseModal = useCallback(() => {
     setSelectedContributor(null);
     setShowModal(false);
-  };
+  }, []);
 
-  const handleOpenGitHubProfile = (url) => {
+  const handleOpenGitHubProfile = useCallback((url) => {
     if (!url) return;
     window.open(url, "_blank", "noopener,noreferrer");
-  };
+  }, []);
 
-  const handleOpenRepo = () => {
+  const handleOpenRepo = useCallback(() => {
     window.open(PROJECT_ADMIN.repoUrl, "_blank", "noopener,noreferrer");
-  };
+  }, []);
 
   return (
     <div className="contributors-page">
@@ -211,21 +310,17 @@ const Contributors = () => {
         <div className="contributors-stats">
           <div className="contributors-stat-card">
             <span className="stat-label">Contributors</span>
-            <span className="stat-value">{contributors.length}</span>
+            <span className="stat-value">{stats.count}</span>
           </div>
 
           <div className="contributors-stat-card">
             <span className="stat-label">Total PRs</span>
-            <span className="stat-value">
-              {contributors.reduce((sum, c) => sum + c.totalPRs, 0)}
-            </span>
+            <span className="stat-value">{stats.totalPRs}</span>
           </div>
 
           <div className="contributors-stat-card">
             <span className="stat-label">Total Points</span>
-            <span className="stat-value">
-              {contributors.reduce((sum, c) => sum + c.totalPoints, 0)}
-            </span>
+            <span className="stat-value">{stats.totalPoints}</span>
           </div>
         </div>
       </section>
@@ -273,6 +368,9 @@ const Contributors = () => {
                 src={PROJECT_ADMIN.avatarUrl}
                 alt={PROJECT_ADMIN.username}
                 className="project-admin-avatar"
+                loading="lazy"
+                width="120"
+                height="120"
               />
               <div className="admin-badge">👑</div>
             </div>
@@ -338,52 +436,12 @@ const Contributors = () => {
         {!loading && !error && filteredContributors.length > 0 && (
           <div className="contributors-grid">
             {filteredContributors.map((c) => (
-              <article
+              <ContributorCard
                 key={c.username}
-                className={`contributor-card contributor-rank-${c.rank.toLowerCase().replace(' ', '-').replace('🥇', '').replace('🥈', '').replace('🥉', '')}`}
-              >
-                <div className="contributor-header">
-                  <div className="contributor-avatar-wrapper">
-                    <img
-                      src={c.avatar_url}
-                      alt={c.username}
-                      className="contributor-avatar"
-                    />
-                  </div>
-                  <div className="contributor-basic-info">
-                    <h2 className="contributor-username">{c.username}</h2>
-                    <p className={`contributor-rank contributor-rank-${c.rank.toLowerCase().replace(' ', '-').replace('🥇', '').replace('🥈', '').replace('🥉', '')}`}>
-                      {c.rank}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="contributor-stats">
-                  <div className="contributor-stat-item">
-                    <span className="contributor-stat-label">Points</span>
-                    <span className="contributor-stat-value">{c.totalPoints}</span>
-                  </div>
-                  <div className="contributor-stat-item">
-                    <span className="contributor-stat-label">Merged PRs</span>
-                    <span className="contributor-stat-value">{c.totalPRs}</span>
-                  </div>
-                </div>
-
-                <div className="contributor-actions">
-                  <button
-                    className="btn btn-primary btn-view-prs"
-                    onClick={() => handleOpenModal(c)}
-                  >
-                    View PR details
-                  </button>
-                  <button
-                    className="btn btn-outline btn-view-github"
-                    onClick={() => handleOpenGitHubProfile(c.html_url)}
-                  >
-                    GitHub Profile →
-                  </button>
-                </div>
-              </article>
+                contributor={c}
+                onOpenModal={handleOpenModal}
+                onOpenGitHub={handleOpenGitHubProfile}
+              />
             ))}
           </div>
         )}

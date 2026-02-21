@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { ArrowUp } from "lucide-react";
 
-const ScrollToTop = () => {
+const ScrollToTop = ({lenis}) => {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -14,10 +14,11 @@ const ScrollToTop = () => {
   }, []);
 
   const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
+    if (lenis) {
+      lenis.scrollTo(0);
+    } else {
+      window.scrollTo({ top: 0,behavior:"smooth" });
+    }
   };
 
   if (!visible) return null;
