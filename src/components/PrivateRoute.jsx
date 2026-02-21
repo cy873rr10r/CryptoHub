@@ -1,12 +1,25 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Navigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { notifySuccess } from "../utils/notify";
 
 const PrivateRoute = ({ children, requireEmailVerification = false }) => {
   const { currentUser, loading, sendVerificationEmail } = useAuth();
   const [resending, setResending] = useState(false);
   const [resent, setResent] = useState(false);
   const [resendError, setResendError] = useState(null);
+
+  // Show success notification when email gets verified
+  useEffect(() => {
+    if (requireEmailVerification && currentUser?.emailVerified) {
+      const hasShownVerification = sessionStorage.getItem(`verification-success-${currentUser.uid}`);
+      
+      if (!hasShownVerification) {
+        notifySuccess("🎉 Email verified successfully! Welcome to CryptoHub.");
+        sessionStorage.setItem(`verification-success-${currentUser.uid}`, 'true');
+      }
+    }
+  }, [currentUser?.emailVerified, currentUser?.uid, requireEmailVerification]);
 
   const handleResend = async () => {
     setResendError(null);
@@ -75,19 +88,29 @@ const PrivateRoute = ({ children, requireEmailVerification = false }) => {
         textAlign: 'center',
         color: '#fff'
       }}>
-        <h2>Email Verification Required</h2>
-        <p>Please verify your email address to access this feature.</p>
-        <p>Check your inbox for the verification link.</p>
-        <p>Verification period is 24 hours.</p>
+        <h2 style={{ fontSize: '28px', marginBottom: '16px' }}>📧 Email Verification Required</h2>
+        <p style={{ fontSize: '16px', marginBottom: '12px', maxWidth: '500px' }}>Please verify your email address to access this feature.</p>
+        <p style={{ fontSize: '16px', marginBottom: '16px', maxWidth: '500px' }}>Check your <strong>inbox</strong> (and <strong>spam/junk folder</strong>) for the verification link.</p>
+        <p style={{ fontSize: '14px', color: '#fbbf24', marginBottom: '20px' }}>⏰ Verification link expires in 24 hours.</p>
         {resendError && (
           <p style={{ color: '#f87171', marginTop: '8px' }}>
             {resendError}
           </p>
         )}
         {resent && !resendError && (
-          <p style={{ color: '#22c55e', marginTop: '8px' }}>
-            Verification email resent. Please check your inbox or spam.
-          </p>
+          <div style={{ 
+            color: '#22c55e', 
+            marginTop: '16px', 
+            fontSize: '16px', 
+            fontWeight: '600',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '8px'
+          }}>
+            <span>✅ Verification email resent successfully!</span>
+            <span style={{ fontSize: '14px', fontWeight: '400' }}>Please check your inbox and spam/junk folder.</span>
+          </div>
         )}
         <button
           onClick={handleResend}

@@ -88,11 +88,15 @@ function Signup() {
         const userCredential = await signup(formData.email, formData.password, formData.fullName);
         console.log('🔐 Signup completed for:', formData.email);
         
-        // Send verification email with user object
+        // Reload user to ensure Firebase has fully registered them
+        await userCredential.user.reload();
+        console.log('🔄 User reloaded, now sending verification email...');
+        
+        // Send verification email with reloaded user object
         try {
           await sendVerificationEmail(userCredential.user);
           setVerificationSent(true);
-          notifySuccess("Account created! Verification email sent. Check your inbox/spam folder.");
+          notifySuccess("✅ Account created! Verification email sent to " + formData.email + ". Please check your inbox AND spam/junk folder.");
         } catch (verifyError) {
           console.error("❌ Verification email error:", verifyError);
           console.error("Error details:", verifyError.message, verifyError.code);

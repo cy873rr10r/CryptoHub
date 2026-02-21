@@ -191,8 +191,14 @@ export const AuthProvider = ({ children }) => {
       throw new Error("No user is logged in.");
     }
     
+    // Configure email action settings for better UX
+    const actionCodeSettings = {
+      url: window.location.origin + '/dashboard',
+      handleCodeInApp: false,
+    };
+    
     console.log('📧 Sending verification email to:', userToVerify.email);
-    await sendEmailVerification(userToVerify);
+    await sendEmailVerification(userToVerify, actionCodeSettings);
     console.log('✅ Verification email sent successfully');
   }, []);
 
