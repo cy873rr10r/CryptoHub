@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthProvider";
+import { useAuth } from "../../context/useAuth";
 import "./ForgotPassword.css";
 import { motion } from "framer-motion";
 import { FiMail, FiArrowLeft, FiCheckCircle } from "react-icons/fi";
@@ -45,7 +45,7 @@ function ForgotPassword() {
         await resetPassword(email);
         setEmailSent(true);
         notifySuccess("Password reset email sent! Check your inbox.");
-        
+
         // Redirect to login after 5 seconds
         setTimeout(() => navigate("/login"), 5000);
       } catch (error) {
@@ -56,7 +56,9 @@ function ForgotPassword() {
         if (error.code === "auth/user-not-found") {
           // For security, we still show success message even if user not found
           setEmailSent(true);
-          notifySuccess("If an account exists with this email, a reset link has been sent.");
+          notifySuccess(
+            "If an account exists with this email, a reset link has been sent.",
+          );
           setTimeout(() => navigate("/login"), 5000);
           return;
         } else if (error.code === "auth/too-many-requests") {
@@ -91,7 +93,8 @@ function ForgotPassword() {
             <div className="auth-header">
               <h1 className="auth-title">Forgot Password?</h1>
               <p className="auth-subtitle">
-                No worries! Enter your email and we'll send you reset instructions.
+                No worries! Enter your email and we'll send you reset
+                instructions.
               </p>
             </div>
 
@@ -118,7 +121,11 @@ function ForgotPassword() {
                 )}
               </div>
 
-              <button type="submit" className="btn-neon w-full" disabled={loading}>
+              <button
+                type="submit"
+                className="btn-neon w-full"
+                disabled={loading}
+              >
                 {loading ? "Sending..." : "Send Reset Link"}
               </button>
 

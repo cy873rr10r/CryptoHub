@@ -1,12 +1,21 @@
 // Pricing.jsx - FIXED & PRODUCTION READY VERSION
-import { useTheme } from "../../context/ThemeContext";
+import { useTheme } from "../../context/useTheme";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import './Pricing.css';
+import "./Pricing.css";
 import {
-  FiCheck, FiX, FiInfo, FiArrowRight, FiStar, FiShield, FiClock,
-  FiUsers, FiTrendingUp, FiZap, FiPlus
+  FiCheck,
+  FiX,
+  FiInfo,
+  FiArrowRight,
+  FiStar,
+  FiShield,
+  FiClock,
+  FiUsers,
+  FiTrendingUp,
+  FiZap,
+  FiPlus,
 } from "react-icons/fi";
 import { plans, faqs, comparisonFeatures } from "../../data/pricingPlansData";
 
@@ -21,36 +30,40 @@ export default function Pricing() {
   useEffect(() => {
     const handleScroll = () => {
       const scrollTop = window.scrollY;
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const docHeight =
+        document.documentElement.scrollHeight - window.innerHeight;
       setScrollProgress(scrollTop / docHeight);
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   // FIXED: Memoized handlers to prevent re-renders
-  const handlePlanClick = useCallback((planName) => {
-    if (planName === "Explorer") {
-      navigate("/signup");
-    } else {
-      // Simulate payment modal
-      const modal = document.getElementById('payment-modal');
-      if (modal) {
-        modal.showModal();
+  const handlePlanClick = useCallback(
+    (planName) => {
+      if (planName === "Explorer") {
+        navigate("/signup");
       } else {
-        alert("Payment coming soon! 🚀");
+        // Simulate payment modal
+        const modal = document.getElementById("payment-modal");
+        if (modal) {
+          modal.showModal();
+        } else {
+          alert("Payment coming soon! 🚀");
+        }
       }
-    }
-  }, [navigate]);
+    },
+    [navigate],
+  );
 
   const toggleBillingCycle = useCallback(() => {
-    setBillingCycle(prev => prev === "monthly" ? "yearly" : "monthly");
+    setBillingCycle((prev) => (prev === "monthly" ? "yearly" : "monthly"));
   }, []);
 
   const getPrice = useCallback((planPrice, cycle) => {
     if (cycle === "yearly") {
-      const monthlyPrice = parseFloat(planPrice.replace('$', '')) || 0;
+      const monthlyPrice = parseFloat(planPrice.replace("$", "")) || 0;
       const yearlyPrice = (monthlyPrice * 12 * 0.83).toFixed(0); // 17% discount
       return `$${yearlyPrice}/year`;
     }
@@ -64,9 +77,9 @@ export default function Pricing() {
       opacity: 1,
       transition: {
         staggerChildren: 0.1,
-        delayChildren: 0.2
-      }
-    }
+        delayChildren: 0.2,
+      },
+    },
   };
 
   const itemVariants = {
@@ -74,8 +87,8 @@ export default function Pricing() {
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.6 }
-    }
+      transition: { duration: 0.6 },
+    },
   };
 
   const cardVariants = {
@@ -83,17 +96,17 @@ export default function Pricing() {
     visible: {
       opacity: 1,
       scale: 1,
-      transition: { duration: 0.5 }
+      transition: { duration: 0.5 },
     },
     hover: {
       y: -10,
       scale: 1.02,
-      transition: { duration: 0.3 }
-    }
+      transition: { duration: 0.3 },
+    },
   };
 
   return (
-    <div className={`min-h-screen ${isDark ? 'dark' : ''}`}>
+    <div className={`min-h-screen ${isDark ? "dark" : ""}`}>
       {/* FIXED: Progress Bar */}
       <motion.div
         className="fixed top-0 left-0 h-1 bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 z-50 origin-left"
@@ -143,7 +156,8 @@ export default function Pricing() {
             className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto mb-16 leading-relaxed"
             variants={itemVariants}
           >
-            Choose the perfect plan for your trading journey with lightning-fast signals and enterprise-grade tools.
+            Choose the perfect plan for your trading journey with lightning-fast
+            signals and enterprise-grade tools.
           </motion.p>
 
           {/* FIXED: Working Billing Toggle */}
@@ -153,7 +167,9 @@ export default function Pricing() {
             transition={{ type: "spring" }}
           >
             <div className="flex flex-col lg:flex-row justify-center items-center gap-6">
-              <span className={`text-lg font-semibold ${billingCycle === 'monthly' ? 'text-gray-900 dark:dark:text-yellow-400' : 'text-gray-500 dark:text-gray-400'}`}>
+              <span
+                className={`text-lg font-semibold ${billingCycle === "monthly" ? "text-gray-900 dark:dark:text-yellow-400" : "text-gray-500 dark:text-gray-400"}`}
+              >
                 Monthly
               </span>
 
@@ -167,25 +183,27 @@ export default function Pricing() {
                 <motion.div
                   className="absolute top-2 w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full shadow-lg flex items-center justify-center shadow-purple-500/50"
                   animate={{
-                    x: billingCycle === 'yearly' ? 56 : 0
+                    x: billingCycle === "yearly" ? 56 : 0,
                   }}
                   transition={{
                     type: "spring",
                     stiffness: 300,
-                    damping: 25
+                    damping: 25,
                   }}
                 >
                   <FiZap className="text-white w-5 h-5" />
                 </motion.div>
               </motion.button>
 
-              <span className={`text-lg font-semibold flex items-center gap-2 ${billingCycle === 'yearly' ? 'text-gray-900 dark:text-yellow-400' : 'text-gray-500 dark:text-gray-400'}`}>
+              <span
+                className={`text-lg font-semibold flex items-center gap-2 ${billingCycle === "yearly" ? "text-gray-900 dark:text-yellow-400" : "text-gray-500 dark:text-gray-400"}`}
+              >
                 Yearly
               </span>
             </div>
 
             <AnimatePresence mode="wait">
-              {billingCycle === 'yearly' && (
+              {billingCycle === "yearly" && (
                 <motion.div
                   key="save-badge"
                   initial={{ height: 0, opacity: 0 }}
@@ -213,14 +231,13 @@ export default function Pricing() {
       >
         <div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-8 lg:gap-12">
           {plans.map((plan) => {
-
             const currentPrice = getPrice(plan?.price, billingCycle);
 
             return (
               <motion.div
                 key={plan.name}
                 className={`glass-panel rounded-3xl p-1 relative overflow-hidden group
-                  ${plan.highlight ? 'ring-4 ring-purple-500/20 shadow-2xl shadow-purple-500/25 lg:scale-[1.02]' : 'shadow-xl'}`}
+                  ${plan.highlight ? "ring-4 ring-purple-500/20 shadow-2xl shadow-purple-500/25 lg:scale-[1.02]" : "shadow-xl"}`}
                 variants={cardVariants}
                 initial="hidden"
                 whileInView="visible"
@@ -229,7 +246,6 @@ export default function Pricing() {
               >
                 {/* Card Background */}
                 <div className="h-full w-full bg-linear-to-br bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl rounded-[1.75rem] p-8 flex flex-col relative z-10 border border-white/30 dark:border-gray-700/50">
-
                   {/* Popular Badge */}
                   {plan.highlight && (
                     <motion.div
@@ -243,9 +259,7 @@ export default function Pricing() {
 
                   {/* Header */}
                   <div className="text-center mb-8 flex-1">
-                    <h3 className="text-3xl font-black mb-6">
-                      {plan.name}
-                    </h3>
+                    <h3 className="text-3xl font-black mb-6">{plan.name}</h3>
                     <div className="mb-6">
                       <div className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 mb-2">
                         {currentPrice}
@@ -264,33 +278,46 @@ export default function Pricing() {
                     {plan.features.map((feature, i) => (
                       <motion.div
                         key={i}
-                        className={`flex items-center gap-4 py-1 rounded-xl transition-all duration-300 group/feature hover:bg-white/50 dark:hover:bg-gray-800/50 ${feature.available ? '' : 'opacity-60'
-                          }`}
-                        whileHover={{ paddingLeft: '2.5rem' }}
+                        className={`flex items-center gap-4 py-1 rounded-xl transition-all duration-300 group/feature hover:bg-white/50 dark:hover:bg-gray-800/50 ${
+                          feature.available ? "" : "opacity-60"
+                        }`}
+                        whileHover={{ paddingLeft: "2.5rem" }}
                       >
-                        <div className={`w-7 h-7 rounded-xl flex items-center justify-center shadow-lg shrink-0 ${feature.available
-                          ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-emerald-500/40'
-                          : 'bg-gray-200/50 dark:bg-gray-700/50 text-gray-400 border-2 border-gray-300/50 dark:border-gray-600/50'
-                          }`}>
-                          {feature.available ? <FiCheck className="w-6 h-6" /> : <FiX className="w-6 h-6" />}
+                        <div
+                          className={`w-7 h-7 rounded-xl flex items-center justify-center shadow-lg shrink-0 ${
+                            feature.available
+                              ? "bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-emerald-500/40"
+                              : "bg-gray-200/50 dark:bg-gray-700/50 text-gray-400 border-2 border-gray-300/50 dark:border-gray-600/50"
+                          }`}
+                        >
+                          {feature.available ? (
+                            <FiCheck className="w-6 h-6" />
+                          ) : (
+                            <FiX className="w-6 h-6" />
+                          )}
                         </div>
-                        <span className="font-medium text-gray-900 dark:text-white">{feature.label}</span>
+                        <span className="font-medium text-gray-900 dark:text-white">
+                          {feature.label}
+                        </span>
                       </motion.div>
                     ))}
                   </div>
 
                   {/* CTA Button */}
                   <motion.button
-                    className={`w-full py-6 px-8 rounded-2xl font-bold text-lg uppercase tracking-wider shadow-2xl transition-all duration-300 overflow-hidden relative ${plan.highlight
-                      ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-purple-500/40 hover:shadow-purple-500/60 hover:-translate-y-1'
-                      : 'bg-gray-700 dark:bg-gray-700 text-gray-900 dark:text-white border-2 border-gray-200/50 dark:border-gray-600/50 hover:bg-gray-800 dark:hover:bg-gray-900'
-                      }`}
+                    className={`w-full py-6 px-8 rounded-2xl font-bold text-lg uppercase tracking-wider shadow-2xl transition-all duration-300 overflow-hidden relative ${
+                      plan.highlight
+                        ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-purple-500/40 hover:shadow-purple-500/60 hover:-translate-y-1"
+                        : "bg-gray-700 dark:bg-gray-700 text-gray-900 dark:text-white border-2 border-gray-200/50 dark:border-gray-600/50 hover:bg-gray-800 dark:hover:bg-gray-900"
+                    }`}
                     onClick={() => handlePlanClick(plan.name)}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.98 }}
                   >
                     <span className="relative z-10 flex items-center justify-center gap-3">
-                      {plan.name === "Explorer" ? "Get Started Free" : "Upgrade Now"}
+                      {plan.name === "Explorer"
+                        ? "Get Started Free"
+                        : "Upgrade Now"}
                       <FiArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                     </span>
                   </motion.button>
@@ -327,7 +354,9 @@ export default function Pricing() {
                   {plans.map((plan) => (
                     <th key={plan.name} className="p-6 text-center relative">
                       <div>
-                        <div className="text-2xl font-black mb-1">{plan.name}</div>
+                        <div className="text-2xl font-black mb-1">
+                          {plan.name}
+                        </div>
                         <div className="text-sm text-gray-500 uppercase tracking-wider">
                           {getPrice(plan.price, billingCycle)}
                         </div>
@@ -343,14 +372,20 @@ export default function Pricing() {
               </thead>
               <tbody className="divide-y divide-gray-200/50 dark:divide-gray-700/50">
                 {comparisonFeatures.map((feature, index) => (
-                  <tr key={index} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors">
+                  <tr
+                    key={index}
+                    className="hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors"
+                  >
                     <td className="p-6 font-semibold text-lg text-gray-900 dark:text-white">
                       {feature.name}
                     </td>
                     {plans.map((plan) => {
-                      const available = plan.features.find(f =>
-                        f.label?.toLowerCase().includes(feature.name.toLowerCase())
-                      )?.available || false;
+                      const available =
+                        plan.features.find((f) =>
+                          f.label
+                            ?.toLowerCase()
+                            .includes(feature.name.toLowerCase()),
+                        )?.available || false;
                       return (
                         <td key={plan.name} className="p-8 text-center">
                           {available ? (
@@ -404,7 +439,9 @@ export default function Pricing() {
               >
                 <motion.button
                   className="w-full py-8 px-10 text-left hover:bg-white/50 dark:hover:bg-gray-800/50 transition-all duration-300"
-                  onClick={() => setOpenFaqIndex(openFaqIndex === index ? null : index)}
+                  onClick={() =>
+                    setOpenFaqIndex(openFaqIndex === index ? null : index)
+                  }
                   whileTap={{ scale: 0.98 }}
                 >
                   <div className="flex items-center justify-between">
@@ -441,7 +478,10 @@ export default function Pricing() {
       </motion.section>
 
       {/* FIXED: Payment Modal */}
-      <dialog id="payment-modal" className="backdrop:bg-black/80 p-8 w-full max-w-md mx-auto">
+      <dialog
+        id="payment-modal"
+        className="backdrop:bg-black/80 p-8 w-full max-w-md mx-auto"
+      >
         <motion.form
           className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-3xl p-12 shadow-2xl border border-white/50 dark:border-gray-700/50"
           initial={{ scale: 0.9, opacity: 0, y: 20 }}
@@ -452,15 +492,15 @@ export default function Pricing() {
             Payment Setup
           </h3>
           <p className="text-center text-gray-600 dark:text-gray-300 mb-12 text-lg leading-relaxed">
-            Secure payment processing is rolling out soon.
-            You'll be the first to know when it's live!
+            Secure payment processing is rolling out soon. You'll be the first
+            to know when it's live!
           </p>
           <div className="space-y-4">
             <button
               type="button"
               className="w-full bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white py-4 px-6 rounded-2xl font-bold shadow-lg transition-all hover:shadow-xl hover:-translate-y-1"
               onClick={() => {
-                const modal = document.getElementById('payment-modal');
+                const modal = document.getElementById("payment-modal");
                 modal?.close();
               }}
             >
@@ -481,8 +521,14 @@ export default function Pricing() {
           animation: modalSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         @keyframes modalSlideIn {
-          from { opacity: 0; transform: scale(0.95) translateY(20px); }
-          to { opacity: 1; transform: scale(1) translateY(0); }
+          from {
+            opacity: 0;
+            transform: scale(0.95) translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+          }
         }
       `}</style>
     </div>

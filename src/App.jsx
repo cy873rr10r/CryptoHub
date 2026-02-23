@@ -1,4 +1,4 @@
-import React, { useEffect, useContext, useRef, useMemo } from "react";
+import React, { useEffect, useContext, useRef, lazy, Suspense, useMemo } from "react";
 import Lenis from "lenis";
 import Navbar from "@/components/Layout/Navbar";
 import { Routes, Route, useLocation } from "react-router-dom";
@@ -40,10 +40,14 @@ import PageNotFound from "@/components/Common/PageNotFound";
 import About from "@/components/Sections/About";
 import CryptoChatbot from "./CryptoChatbot/CryptoChatbot";
 import Feedback from "./pages/Feedback";
+
 import TrendingCoins from "@/pages/TrendingCoins";
 import NewListings from "@/pages/NewListings";
-import TopLosers from "@/pages/TopLosers";
-import ApiAccess from "@/pages/ApiAccess";
+import TopGainers from "./pages/TopGainers";
+import AIBlogPage from "./pages/AIBlog/AIBlogPage";
+import TopLosers from "./pages/TopLosers";
+import ApiAccess from "./pages/ApiAccess";
+
 
 const App = () => {
   const lenisRef = useRef(null);
@@ -145,10 +149,13 @@ const App = () => {
                 <Route path="/blog" element={<Blog />} />
                 <Route path="/blog/:slug" element={<BlogDetail />} />
                 <Route path="/blog/article/:id" element={<BlogDetail />} />
+                <Route path="/ai-blog" element={<Suspense fallback={<div style={{ minHeight: '100vh', background: '#0a0a0a' }} />}><AIBlogPage /></Suspense>} />
                 <Route path="/trending" element={<TrendingCoins />} />
                 <Route path="/new-listings" element={<NewListings />} />
                 <Route path="/top-losers" element={<TopLosers />} />
                 <Route path="/api-access" element={<ApiAccess />} />
+
+                <Route path="/gainers" element={<TopGainers />} />
 
                 <Route path="/features" element={<Features />} />
                 <Route path="/signup" element={<Signup />} />

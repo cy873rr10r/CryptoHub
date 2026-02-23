@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthProvider";
+import { useAuth } from "../../context/useAuth";
 import "./Login.css";
 import { motion } from "framer-motion";
 import { FiMail, FiLock, FiEye, FiEyeOff } from "react-icons/fi";
-import { notifyError, notifySuccess } from "../../utils/notify";
+import { notifyError, notifySuccess, notifyInfo } from "../../utils/notify";
 
 function Login() {
   const navigate = useNavigate();
@@ -138,7 +138,8 @@ function Login() {
         <div className="auth-header">
           <h1 className="auth-title">Welcome Back</h1>
           <p className="auth-subtitle">
-            Access your <span className="text-gradient-cyan">CryptoHub</span> Dashboard
+            Access your <span className="text-gradient-cyan">CryptoHub</span>{" "}
+            Dashboard
           </p>
         </div>
 
@@ -218,7 +219,11 @@ function Login() {
             onClick={handleGoogleLogin}
             disabled={loading}
           >
-            <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="google-icon" />
+            <img
+              src="https://www.svgrepo.com/show/475656/google-color.svg"
+              alt="Google"
+              className="google-icon"
+            />
             Google Account
           </button>
         </form>

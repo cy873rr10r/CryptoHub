@@ -1,24 +1,24 @@
 import React from "react";
-import { useLeaderboard } from "../../context/LeaderboardContext";
-import { useAuth } from "../../context/AuthProvider";
+import { useLeaderboard } from "../../context/useLeaderboard";
+import { useAuth } from "../../context/useAuth";
 import "./Leaderboard.css";
 
 function Leaderboard() {
-    const { leaderboard, userRank, loading } = useLeaderboard();
-    const { currentUser } = useAuth();
+  const { leaderboard, userRank, loading } = useLeaderboard();
+  const { currentUser } = useAuth();
 
-    if (loading) {
-        return (
-            <div className="leaderboard-container">
-                <div className="leaderboard-loading">
-                    <div className="coin-loader">
-                        <div className="spin"></div>
-                    </div>
-                    <p>Loading leaderboard...</p>
-                </div>
-            </div>
-        );
-    }
+  if (loading) {
+    return (
+      <div className="leaderboard-container">
+        <div className="leaderboard-loading">
+          <div className="coin-loader">
+            <div className="spin"></div>
+          </div>
+          <p>Loading leaderboard...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
@@ -39,23 +39,24 @@ function Leaderboard() {
           Top crypto enthusiasts ranked by activity
         </p>
         {userRank && (
-          <div className="user-rank-badge">
-            Your Rank: #{userRank}
-          </div>
+          <div className="user-rank-badge">Your Rank: #{userRank}</div>
         )}
       </div>
 
       <div className="leaderboard-list">
         {leaderboard.length === 0 ? (
           <div className="no-data">
-            <p>No leaderboard data yet. Start tracking coins to climb the ranks!</p>
+            <p>
+              No leaderboard data yet. Start tracking coins to climb the ranks!
+            </p>
           </div>
         ) : (
           leaderboard.map((entry, index) => (
             <div
               key={entry.id}
-              className={`leaderboard-item ${currentUser?.uid === entry.uid ? "current-user" : ""
-                } ${index < 3 ? `rank-${index + 1}` : ""}`}
+              className={`leaderboard-item ${
+                currentUser?.uid === entry.uid ? "current-user" : ""
+              } ${index < 3 ? `rank-${index + 1}` : ""}`}
             >
               <div className="rank-badge">
                 {index === 0 && "🥇"}
@@ -102,11 +103,21 @@ function Leaderboard() {
         <div className="points-guide">
           <h3>How to earn points:</h3>
           <ul>
-            <li>View a coin: <strong>+1 point</strong></li>
-            <li>Add to portfolio: <strong>+5 points</strong></li>
-            <li>Update portfolio: <strong>+2 points</strong></li>
-            <li>Set price alert: <strong>+3 points</strong></li>
-            <li>View chart: <strong>+2 points</strong></li>
+            <li>
+              View a coin: <strong>+1 point</strong>
+            </li>
+            <li>
+              Add to portfolio: <strong>+5 points</strong>
+            </li>
+            <li>
+              Update portfolio: <strong>+2 points</strong>
+            </li>
+            <li>
+              Set price alert: <strong>+3 points</strong>
+            </li>
+            <li>
+              View chart: <strong>+2 points</strong>
+            </li>
           </ul>
         </div>
       </div>

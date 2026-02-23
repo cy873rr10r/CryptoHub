@@ -14,7 +14,7 @@ import {
 } from "react-icons/fi";
 import "./Blog.css";
 import { generateBlogPosts } from "../../data/blogData";
-import { useAuth } from "../../context/AuthProvider";
+import { useAuth } from "../../context/useAuth";
 import { toggleBookmark, getBookmarks } from "../../services/bookmarkService";
 
 const BlogDetail = () => {
@@ -29,8 +29,8 @@ const BlogDetail = () => {
 
   // 🔒 SAFELY find blog - handle both slug and id params
   const blogId = id || slug;
-  const blog = blogPosts.find((post) =>
-    post.id === Number(blogId) || post.slug === blogId
+  const blog = blogPosts.find(
+    (post) => post.id === Number(blogId) || post.slug === blogId,
   );
 
   // Check if bookmarked on load
@@ -55,10 +55,7 @@ const BlogDetail = () => {
     return (
       <div className="blog-detail-error">
         <h2>Blog not found</h2>
-        <button
-          onClick={() => navigate("/blog")}
-          className="back-to-blog-btn"
-        >
+        <button onClick={() => navigate("/blog")} className="back-to-blog-btn">
           ← Back to All Insights
         </button>
       </div>
@@ -83,8 +80,7 @@ const BlogDetail = () => {
       },
       {
         heading: "Overview",
-        text:
-          "This article is currently being prepared with detailed analysis and insights.",
+        text: "This article is currently being prepared with detailed analysis and insights.",
       },
     ],
   };
@@ -147,16 +143,11 @@ const BlogDetail = () => {
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
       >
-        <button
-          onClick={() => navigate("/blog")}
-          className="breadcrumb-link"
-        >
+        <button onClick={() => navigate("/blog")} className="breadcrumb-link">
           <FiArrowLeft /> All Insights
         </button>
         <span className="breadcrumb-divider">/</span>
-        <span className="breadcrumb-current">
-          {blog.category || "Article"}
-        </span>
+        <span className="breadcrumb-current">{blog.category || "Article"}</span>
       </motion.div>
 
       {/* Header */}
@@ -182,8 +173,16 @@ const BlogDetail = () => {
 
         <div className="blog-metadata">
           <Meta icon={<FiUser />} label="AUTHOR" value="Thomas Wright" />
-          <Meta icon={<FiCalendar />} label="PUBLISHED" value={blog.date || "N/A"} />
-          <Meta icon={<FiClock />} label="READ TIME" value={blog.readTime || "N/A"} />
+          <Meta
+            icon={<FiCalendar />}
+            label="PUBLISHED"
+            value={blog.date || "N/A"}
+          />
+          <Meta
+            icon={<FiClock />}
+            label="READ TIME"
+            value={blog.readTime || "N/A"}
+          />
           <Meta icon={<FiEye />} label="VIEWS" value={views.toLocaleString()} />
         </div>
       </motion.div>
@@ -241,11 +240,7 @@ const BlogDetail = () => {
             onClick={handleBookmark}
             active={isBookmarked}
           />
-          <Action
-            icon={<FiShare2 />}
-            title="Share"
-            onClick={handleShare}
-          />
+          <Action icon={<FiShare2 />} title="Share" onClick={handleShare} />
           <Action
             icon={<FiExternalLink />}
             title="Open in new tab"

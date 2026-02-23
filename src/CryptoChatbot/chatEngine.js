@@ -1,6 +1,6 @@
 /**
  * Chat Engine — Intent Parser + Response Generator
- * 
+ *
  * Entirely rule-based NLP. Zero API calls for understanding.
  * Uses regex, keyword matching, and pattern recognition.
  */
@@ -31,9 +31,7 @@ const INTENT_PATTERNS = [
   },
   {
     intent: "help",
-    patterns: [
-      /\b(help|what can you do|commands|features|menu|options)\b/i,
-    ],
+    patterns: [/\b(help|what can you do|commands|features|menu|options)\b/i],
   },
   {
     intent: "market_overview",
@@ -106,9 +104,7 @@ const INTENT_PATTERNS = [
   },
   {
     intent: "dominance",
-    patterns: [
-      /\b(btc|bitcoin|eth|ethereum)?\s*dominance/i,
-    ],
+    patterns: [/\b(btc|bitcoin|eth|ethereum)?\s*dominance/i],
   },
   {
     intent: "investment",
@@ -177,7 +173,7 @@ function extractCoinName(message) {
   const cleaned = msg
     .replace(
       /\b(what|is|the|price|of|for|how|much|does|cost|tell|me|about|info|details|coin|crypto|token|check|get|show|current|today|now|please|can|you)\b/g,
-      ""
+      "",
     )
     .trim()
     .replace(/\s+/g, " ")
@@ -200,13 +196,58 @@ function extractCoinFromSentence(message) {
 
   // Try to find a known coin alias directly in the message
   const KNOWN_COINS = [
-    "bitcoin", "btc", "ethereum", "eth", "solana", "sol", "bnb", "binance",
-    "xrp", "ripple", "cardano", "ada", "dogecoin", "doge", "polkadot", "dot",
-    "polygon", "matic", "avalanche", "avax", "chainlink", "link", "shiba",
-    "shib", "uniswap", "uni", "litecoin", "ltc", "cosmos", "atom", "near",
-    "stellar", "xlm", "algorand", "algo", "aptos", "apt", "arbitrum", "arb",
-    "optimism", "op", "sui", "ton", "toncoin", "tether", "usdt", "usdc",
-    "pepe", "tron", "trx", "wif", "dogwifhat",
+    "bitcoin",
+    "btc",
+    "ethereum",
+    "eth",
+    "solana",
+    "sol",
+    "bnb",
+    "binance",
+    "xrp",
+    "ripple",
+    "cardano",
+    "ada",
+    "dogecoin",
+    "doge",
+    "polkadot",
+    "dot",
+    "polygon",
+    "matic",
+    "avalanche",
+    "avax",
+    "chainlink",
+    "link",
+    "shiba",
+    "shib",
+    "uniswap",
+    "uni",
+    "litecoin",
+    "ltc",
+    "cosmos",
+    "atom",
+    "near",
+    "stellar",
+    "xlm",
+    "algorand",
+    "algo",
+    "aptos",
+    "apt",
+    "arbitrum",
+    "arb",
+    "optimism",
+    "op",
+    "sui",
+    "ton",
+    "toncoin",
+    "tether",
+    "usdt",
+    "usdc",
+    "pepe",
+    "tron",
+    "trx",
+    "wif",
+    "dogwifhat",
   ];
 
   for (const coin of KNOWN_COINS) {
@@ -217,7 +258,7 @@ function extractCoinFromSentence(message) {
   const stripped = msg
     .replace(
       /\b(should|would|could|will|can|do|did|does|is|are|was|were|i|we|you|they|it|if|the|a|an|in|on|at|to|of|for|and|or|but|how|much|many|what|when|where|which|who|why|not|no|yes|my|this|that|right now|right|now|today|tomorrow|currently|invest|investment|investing|buy|buying|sell|selling|hold|holding|trade|trading|put|money|profit|loss|return|gain|earn|make|lose|get|good|bad|best|worst|safe|wise|smart|time|moment|go up|go down|reach|hit|cross|moon|pump|dump|crash|rise|fall|drop|price|prediction|forecast|target|worth|think|believe|suggest|recommend)\b/g,
-      ""
+      "",
     )
     .replace(/[?.!,₹$]/g, "")
     .trim()
@@ -289,7 +330,7 @@ async function handleMarketOverview() {
     const topMover = [...coins].sort(
       (a, b) =>
         Math.abs(b.price_change_percentage_24h || 0) -
-        Math.abs(a.price_change_percentage_24h || 0)
+        Math.abs(a.price_change_percentage_24h || 0),
     )[0];
 
     return `The market is **${sentiment}** today.
@@ -299,17 +340,15 @@ async function handleMarketOverview() {
 ${btc ? `\n**Bitcoin:** ${formatINR(btc.current_price)} (${formatPercent(btc.price_change_percentage_24h)})` : ""}
 ${eth ? `**Ethereum:** ${formatINR(eth.current_price)} (${formatPercent(eth.price_change_percentage_24h)})` : ""}
 ${topMover ? `\n🔥 **Biggest mover in top 10:** ${topMover.name} (${formatPercent(topMover.price_change_percentage_24h)})` : ""}`;
-  } catch (err) {
-    if (err.message === "RATE_LIMITED") {
-      return "⏳ I'm getting rate-limited by the data provider. Please try again in a minute!";
-    }
+  } catch {
     return "Couldn't fetch market data right now. Try again in a moment!";
   }
 }
 
 async function handlePriceCheck(message) {
   const coinName = extractCoinName(message);
-  if (!coinName) return "Which coin's price would you like to check? Try something like 'price of BTC' or 'ETH price'.";
+  if (!coinName)
+    return "Which coin's price would you like to check? Try something like 'price of BTC' or 'ETH price'.";
 
   const coinId = resolveCoinId(coinName);
   try {
@@ -339,9 +378,7 @@ async function handlePriceCheck(message) {
 📈 24h Change: ${formatPercent(coinData.inr_24h_change)}
 📊 Market Cap: ${formatINR(coinData.inr_market_cap)}
 💹 24h Volume: ${formatINR(coinData.inr_24h_vol)}`;
-  } catch (err) {
-    if (err.message === "RATE_LIMITED")
-      return "⏳ Rate limited! Try again in about a minute.";
+  } catch {
     return "Couldn't fetch the price right now. Please try again!";
   }
 }
@@ -352,12 +389,12 @@ async function handleGainers() {
     const list = gainers
       .map(
         (c, i) =>
-          `${i + 1}. **${c.name}** (${c.symbol.toUpperCase()}) — ${formatINR(c.current_price)} (${formatPercent(c.price_change_percentage_24h)})`
+          `${i + 1}. **${c.name}** (${c.symbol.toUpperCase()}) — ${formatINR(c.current_price)} (${formatPercent(c.price_change_percentage_24h)})`,
       )
       .join("\n");
 
     return `🚀 **Top 5 Gainers (24h):**\n\n${list}`;
-  } catch (err) {
+  } catch {
     return "Couldn't fetch gainers right now. Try again in a moment!";
   }
 }
@@ -368,12 +405,12 @@ async function handleLosers() {
     const list = losers
       .map(
         (c, i) =>
-          `${i + 1}. **${c.name}** (${c.symbol.toUpperCase()}) — ${formatINR(c.current_price)} (${formatPercent(c.price_change_percentage_24h)})`
+          `${i + 1}. **${c.name}** (${c.symbol.toUpperCase()}) — ${formatINR(c.current_price)} (${formatPercent(c.price_change_percentage_24h)})`,
       )
       .join("\n");
 
     return `📉 **Top 5 Losers (24h):**\n\n${list}`;
-  } catch (err) {
+  } catch {
     return "Couldn't fetch losers right now. Try again in a moment!";
   }
 }
@@ -381,26 +418,26 @@ async function handleLosers() {
 async function handleTrending() {
   try {
     const trending = await getTrending();
-    if (!trending || trending.length === 0) return "No trending data available right now.";
+    if (!trending || trending.length === 0)
+      return "No trending data available right now.";
 
     const list = trending
       .slice(0, 7)
       .map(
         (c, i) =>
-          `${i + 1}. **${c.name}** (${c.symbol?.toUpperCase()}) — Rank #${c.marketCapRank || "N/A"}`
+          `${i + 1}. **${c.name}** (${c.symbol?.toUpperCase()}) — Rank #${c.marketCapRank || "N/A"}`,
       )
       .join("\n");
 
     return `🔥 **Trending Coins Right Now:**\n\n${list}`;
-  } catch (err) {
+  } catch {
     return "Couldn't fetch trending coins. Try again shortly!";
   }
 }
 
 async function handleCompare(message) {
   const coins = extractCompareCoins(message);
-  if (!coins)
-    return 'Try: "Compare BTC vs ETH" or "SOL vs AVAX"';
+  if (!coins) return 'Try: "Compare BTC vs ETH" or "SOL vs AVAX"';
 
   const [name1, name2] = coins;
   const id1 = resolveCoinId(name1);
@@ -425,11 +462,12 @@ async function handleCompare(message) {
 | **Rank** | #${coin1.market_cap_rank} | #${coin2.market_cap_rank} |
 
 ${
-  (coin1.price_change_percentage_24h || 0) > (coin2.price_change_percentage_24h || 0)
+  (coin1.price_change_percentage_24h || 0) >
+  (coin2.price_change_percentage_24h || 0)
     ? `📈 ${coin1.name} is outperforming ${coin2.name} today.`
     : `📈 ${coin2.name} is outperforming ${coin1.name} today.`
 }`;
-  } catch (err) {
+  } catch {
     return "Couldn't compare those coins right now. Try again shortly!";
   }
 }
@@ -466,7 +504,7 @@ async function handleCoinInfo(message) {
 🔒 Max Supply: ${md.max_supply?.toLocaleString() || "∞"}
 
 📝 ${desc}`;
-  } catch (err) {
+  } catch {
     return `Couldn't fetch info for "${coinName}". Try the exact coin name!`;
   }
 }
@@ -506,7 +544,7 @@ ${
       ? "BTC dominance is low — could signal alt season! Altcoins might be gaining traction."
       : "BTC dominance is moderate — the market is relatively balanced between BTC and alts."
 }`;
-  } catch (err) {
+  } catch {
     return "Couldn't fetch dominance data right now.";
   }
 }
@@ -557,7 +595,14 @@ But I **can** help you research. Try:
 
     const change = coinData.inr_24h_change;
     const trend = change >= 0 ? "up 📈" : "down 📉";
-    const sentiment = change > 3 ? "strong bullish momentum" : change > 0 ? "slight positive movement" : change > -3 ? "slight negative movement" : "strong bearish pressure";
+    const sentiment =
+      change > 3
+        ? "strong bullish momentum"
+        : change > 0
+          ? "slight positive movement"
+          : change > -3
+            ? "slight negative movement"
+            : "strong bearish pressure";
 
     return `I can't predict future profits, but here's what **${resolvedName}** looks like right now:
 
@@ -573,7 +618,7 @@ But I **can** help you research. Try:
 Want deeper research? Try:
 • "Tell me about ${coinName}" — for detailed coin info
 • "Compare ${coinName} vs BTC" — benchmark against Bitcoin`;
-  } catch (err) {
+  } catch {
     return "Couldn't fetch that data right now. Try again in a moment!";
   }
 }
@@ -608,11 +653,14 @@ What I **can** do is show you current data to help you form your own view:
 
     let trendSummary;
     if (change24h > 0 && change7d > 0 && change30d > 0) {
-      trendSummary = "🟢 All timeframes are positive — the trend has been consistently upward recently.";
+      trendSummary =
+        "🟢 All timeframes are positive — the trend has been consistently upward recently.";
     } else if (change24h < 0 && change7d < 0 && change30d < 0) {
-      trendSummary = "🔴 All timeframes are negative — the trend has been consistently downward recently.";
+      trendSummary =
+        "🔴 All timeframes are negative — the trend has been consistently downward recently.";
     } else {
-      trendSummary = "🟡 Mixed signals across timeframes — the trend is uncertain.";
+      trendSummary =
+        "🟡 Mixed signals across timeframes — the trend is uncertain.";
     }
 
     return `I can't predict where **${details.name}** will go, but here's the recent trend data:
@@ -626,7 +674,7 @@ What I **can** do is show you current data to help you form your own view:
 ${trendSummary}
 
 **⚠️ Remember:** Past trends don't predict the future. Crypto is volatile and unpredictable. This is data, not a forecast!`;
-  } catch (err) {
+  } catch {
     return "Couldn't fetch trend data right now. Try again shortly!";
   }
 }
@@ -640,12 +688,20 @@ async function handleBestCoin() {
       getGainersLosers("inr", 3),
     ]);
 
-    const trendList = trending?.slice(0, 3)
-      .map((c, i) => `${i + 1}. **${c.name}** (${c.symbol?.toUpperCase()}) — Rank #${c.marketCapRank || "N/A"}`)
-      .join("\n") || "No trending data";
+    const trendList =
+      trending
+        ?.slice(0, 3)
+        .map(
+          (c, i) =>
+            `${i + 1}. **${c.name}** (${c.symbol?.toUpperCase()}) — Rank #${c.marketCapRank || "N/A"}`,
+        )
+        .join("\n") || "No trending data";
 
     const gainerList = gainers
-      .map((c, i) => `${i + 1}. **${c.name}** (${c.symbol.toUpperCase()}) — ${formatPercent(c.price_change_percentage_24h)}`)
+      .map(
+        (c, i) =>
+          `${i + 1}. **${c.name}** (${c.symbol.toUpperCase()}) — ${formatPercent(c.price_change_percentage_24h)}`,
+      )
       .join("\n");
 
     return `I can't recommend specific investments, but here's what the data shows right now:
@@ -662,21 +718,22 @@ ${gainerList}
 • Consider the project's fundamentals, not just price
 
 Want to research a specific coin? Try "Tell me about [coin name]"`;
-  } catch (err) {
+  } catch {
     return "Couldn't fetch market data right now. Try again in a moment!";
   }
 }
 
 // ─── Unknown Handler ──────────────────────────────────────────────
 
-function handleUnknown(message) {
+function handleUnknown() {
   const suggestions = [
     "I'm not sure I understood that. Here are some things you can try:",
     "Hmm, I didn't quite get that. Maybe try one of these:",
     "I'm best at crypto-related questions! Here are some ideas:",
   ];
 
-  const suggestion = suggestions[Math.floor(Math.random() * suggestions.length)];
+  const suggestion =
+    suggestions[Math.floor(Math.random() * suggestions.length)];
 
   return `${suggestion}
 
@@ -751,7 +808,7 @@ export async function processMessage(message) {
         return handleInvestment(raw);
       }
 
-      return handleUnknown(raw);
+      return handleUnknown();
     }
   }
 }

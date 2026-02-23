@@ -15,6 +15,59 @@ const Coin = () => {
   const [timeframe, setTimeframe] = useState("7"); // Default 7 days
   const { currency } = useContext(CoinContext);
 
+  // Back button to Top Gainers
+  const backButton = (
+    <button
+      onClick={() => navigate('/gainers')}
+      style={{
+        marginBottom: 32,
+        padding: '13px 36px',
+        borderRadius: 16,
+        border: 'none',
+        background: 'linear-gradient(90deg, #5f2eea 0%, #a78bfa 100%)',
+        color: '#fff',
+        fontWeight: 800,
+        fontSize: '1.12rem',
+        cursor: 'pointer',
+        boxShadow: '0 6px 32px 0 rgba(95,46,234,0.18)',
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 14,
+        letterSpacing: '0.04em',
+        transition: 'all 0.18s cubic-bezier(.4,0,.2,1)',
+        outline: 'none',
+        position: 'relative',
+        overflow: 'hidden',
+        zIndex: 1,
+      }}
+      onMouseOver={e => {
+        e.currentTarget.style.background = 'linear-gradient(90deg, #a78bfa 0%, #5f2eea 100%)';
+        e.currentTarget.style.transform = 'translateY(-2px) scale(1.035)';
+        e.currentTarget.style.boxShadow = '0 12px 36px 0 rgba(95,46,234,0.22)';
+      }}
+      onMouseOut={e => {
+        e.currentTarget.style.background = 'linear-gradient(90deg, #5f2eea 0%, #a78bfa 100%)';
+        e.currentTarget.style.transform = 'none';
+        e.currentTarget.style.boxShadow = '0 6px 32px 0 rgba(95,46,234,0.18)';
+      }}
+    >
+      <span style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: 36,
+        height: 36,
+        borderRadius: '50%',
+        background: 'rgba(255,255,255,0.10)',
+        marginRight: 10,
+        boxShadow: '0 2px 8px 0 rgba(95,46,234,0.10)',
+      }}>
+        <svg width="20" height="20" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"/></svg>
+      </span>
+      Back
+    </button>
+  );
+
   // Fetch coin data (separate from historical data)
   useEffect(() => {
     const fetchCoinData = async () => {
@@ -141,27 +194,7 @@ const Coin = () => {
 
   return (
     <div className="coin">
-      {/* Back Button */}
-      <button
-        onClick={() => navigate(-1)}
-        style={{
-          margin: "16px 0",
-          padding: "10px 20px",
-          background: "#2563eb",
-          color: "#fff",
-          border: "none",
-          borderRadius: "6px",
-          cursor: "pointer",
-          fontWeight: "bold",
-          fontSize: "1rem",
-          boxShadow: "0 2px 8px rgba(37,99,235,0.08)",
-          transition: "background 0.2s"
-        }}
-        onMouseOver={e => (e.currentTarget.style.background = '#1d4ed8')}
-        onMouseOut={e => (e.currentTarget.style.background = '#2563eb')}
-      >
-        ← Back to Trending Coins
-      </button>
+      {backButton}
       <div data-aos="fade-right" className="coin-left">
         {/* Header Section with Logo and Name */}
         <div className="coin-header">

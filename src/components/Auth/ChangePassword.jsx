@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useAuth } from "../../context/AuthProvider";
+import { useAuth } from "../../context/useAuth";
 import { useNavigate } from "react-router-dom";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import "./ChangePassword.css";
@@ -81,7 +81,6 @@ const ChangePassword = () => {
     // clear previous messages
     setError("");
 
-
     // validate form before API Call
     if (!validateForm()) {
       return;
@@ -108,11 +107,9 @@ const ChangePassword = () => {
         message = "Session expired. Please log out and log in again.";
       } else if (err.code === "auth/too-many-requests") {
         message = "Too many attempts. Please try again later.";
-      }
-      else if (err.code === "auth/invalid-credential") {
+      } else if (err.code === "auth/invalid-credential") {
         message = "Invalid credentials provided.";
-      }
-      else {
+      } else {
         message = err.message || "Failed to change password. Please try again.";
       }
       notifyError(message);
@@ -126,7 +123,6 @@ const ChangePassword = () => {
       <div className="change-password-card">
         <h2>Change Password</h2>
         <p className="subtitle">Update your account password</p>
-
 
         {/* Error Message */}
         {error && <div className="error-message">{error}</div>}
@@ -150,7 +146,9 @@ const ChangePassword = () => {
                 className="toggle-password"
                 onClick={() => setShowCurrentPassword(!showCurrentPassword)}
                 tabIndex={-1}
-                aria-label={showCurrentPassword ? "Hide password" : "Show password"}
+                aria-label={
+                  showCurrentPassword ? "Hide password" : "Show password"
+                }
               >
                 {showCurrentPassword ? <FiEyeOff /> : <FiEye />}
               </button>
@@ -200,7 +198,9 @@ const ChangePassword = () => {
                 className="toggle-password"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 tabIndex={-1}
-                aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                aria-label={
+                  showConfirmPassword ? "Hide password" : "Show password"
+                }
               >
                 {showConfirmPassword ? <FiEyeOff /> : <FiEye />}
               </button>

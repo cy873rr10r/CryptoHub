@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { useAuth } from "../../context/AuthProvider";
+import { useAuth } from "../../context/useAuth";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { FiLock, FiUser, FiLogOut, FiMail, FiBookmark } from "react-icons/fi";
 import "./Navbar.css";
@@ -13,7 +13,6 @@ function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(null);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-
 
   const isDashboardPage = location.pathname === "/dashboard";
 
@@ -63,18 +62,17 @@ function Navbar() {
       if (openDropdown && !e.target.closest(".dropdown-container")) {
         setOpenDropdown(null);
       }
-      if (isProfileOpen && !e.target.closest('.profile-menu-container')) {
+      if (isProfileOpen && !e.target.closest(".profile-menu-container")) {
         setIsProfileOpen(false);
       }
     };
 
     const handleEscape = (event) => {
-      if (event.key === 'Escape') {
+      if (event.key === "Escape") {
         if (openDropdown) setOpenDropdown(null);
         if (isProfileOpen) setIsProfileOpen(false);
       }
     };
-
 
     document.addEventListener("click", handleClickOutside);
     document.addEventListener("keydown", handleEscape);
@@ -114,8 +112,9 @@ function Navbar() {
 
   return (
     <nav
-      className={`navbar ${scrolled ? "scrolled" : ""} ${isMobileMenuOpen ? "has-mobile-menu" : ""
-        } ${isDashboardPage ? "is-dashboard" : ""}`}
+      className={`navbar ${scrolled ? "scrolled" : ""} ${
+        isMobileMenuOpen ? "has-mobile-menu" : ""
+      } ${isDashboardPage ? "is-dashboard" : ""}`}
     >
       <div className="navbar-content">
         {/* Logo */}
@@ -131,7 +130,9 @@ function Navbar() {
               <li
                 key={link.label}
                 className="navbar-item"
-                onMouseEnter={() => link.dropdown && handleDropdownEnter(link.label)}
+                onMouseEnter={() =>
+                  link.dropdown && handleDropdownEnter(link.label)
+                }
                 onMouseLeave={handleDropdownLeave}
               >
                 {link.dropdown ? (
@@ -144,7 +145,7 @@ function Navbar() {
                       aria-haspopup="true"
                       tabIndex={0}
                       onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
+                        if (e.key === "Enter" || e.key === " ") {
                           e.preventDefault();
                           handleDropdownClick(link.label);
                         }
@@ -153,7 +154,7 @@ function Navbar() {
                       {link.label}
                     </span>
                     <ul
-                      className={`dropdown-menu ${openDropdown === link.label ? 'show' : ''}`}
+                      className={`dropdown-menu ${openDropdown === link.label ? "show" : ""}`}
                       role="menu"
                       aria-label={`${link.label} submenu`}
                     >
@@ -201,13 +202,13 @@ function Navbar() {
                       src={currentUser.photoURL}
                       alt="Profile"
                       style={{
-                        position: 'absolute',
+                        position: "absolute",
                         top: 0,
                         left: 0,
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'cover',
-                        borderRadius: '50%',
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                        borderRadius: "50%",
                       }}
                     />
                   ) : (
@@ -215,7 +216,9 @@ function Navbar() {
                   )}
                 </button>
 
-                <div className={`profile-dropdown ${isProfileOpen ? 'show' : ''}`}>
+                <div
+                  className={`profile-dropdown ${isProfileOpen ? "show" : ""}`}
+                >
                   <div className="profile-dropdown-header">
                     <FiMail className="profile-icon" />
                     <span className="profile-email">{currentUser.email}</span>
@@ -271,8 +274,7 @@ function Navbar() {
 
           {/* Mobile Toggle */}
           <button
-            className={`navbar-toggle ${isMobileMenuOpen ? "active" : ""
-              }`}
+            className={`navbar-toggle ${isMobileMenuOpen ? "active" : ""}`}
             onClick={toggleMobileMenu}
             aria-label="Toggle navigation"
           >
@@ -281,7 +283,6 @@ function Navbar() {
             <span />
           </button>
         </div>
-
       </div>
 
       {/* Mobile Menu Dropdown */}
@@ -317,8 +318,9 @@ function Navbar() {
                 ) : (
                   <Link
                     to={link.to}
-                    className={`mobile-menu-link ${location.pathname === link.to ? "active" : ""
-                      }`}
+                    className={`mobile-menu-link ${
+                      location.pathname === link.to ? "active" : ""
+                    }`}
                     onClick={closeMobileMenu}
                   >
                     {link.label}

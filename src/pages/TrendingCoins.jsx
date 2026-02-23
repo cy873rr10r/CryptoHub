@@ -20,14 +20,14 @@ const TrendingCoins = () => {
 
   useEffect(() => {
     async function fetchTopCoins() {
-      setLoading(true);~
-      setError(null);
+      setLoading(true);
+      ~setError(null);
       try {
         // Fetch top 50 coins by market cap in USD
         const data = await getTopCoins("usd", COINS_PER_PAGE * MAX_PAGES, 1);
         setCoins(data || []);
         setTotalPages(Math.ceil((data?.length || 0) / COINS_PER_PAGE));
-      } catch (err) {
+      } catch {
         setError("Failed to fetch top coins.");
       } finally {
         setLoading(false);
@@ -63,7 +63,7 @@ const TrendingCoins = () => {
           onClick={() => setPage(i)}
         >
           {i}
-        </button>
+        </button>,
       );
     }
     return (
@@ -114,7 +114,9 @@ const TrendingCoins = () => {
                       style={styles.tr}
                       onClick={() => navigate(`/coin/${coin.id}`)}
                     >
-                      <td style={styles.td}>{(page - 1) * COINS_PER_PAGE + index + 1}</td>
+                      <td style={styles.td}>
+                        {(page - 1) * COINS_PER_PAGE + index + 1}
+                      </td>
                       <td style={styles.coinCell}>
                         <img
                           src={coin.image}
@@ -123,14 +125,33 @@ const TrendingCoins = () => {
                         />
                         <div>
                           <div style={styles.coinName}>{coin.name}</div>
-                          <div style={styles.coinSymbol}>{coin.symbol?.toUpperCase()}</div>
+                          <div style={styles.coinSymbol}>
+                            {coin.symbol?.toUpperCase()}
+                          </div>
                         </div>
                       </td>
-                      <td style={styles.td}>${coin.current_price?.toLocaleString()}</td>
-                      <td style={styles.td}>#{coin.market_cap_rank || "N/A"}</td>
-                      <td style={styles.td}>${coin.market_cap?.toLocaleString() || "N/A"}</td>
-                      <td style={{...styles.td, color: coin.price_change_percentage_24h >= 0 ? '#00ffab' : '#ff4d4f', fontWeight: 600}}>
-                        {coin.price_change_percentage_24h !== undefined ? `${coin.price_change_percentage_24h >= 0 ? '↑' : '↓'} ${Math.abs(coin.price_change_percentage_24h).toFixed(2)}%` : '-'}
+                      <td style={styles.td}>
+                        ${coin.current_price?.toLocaleString()}
+                      </td>
+                      <td style={styles.td}>
+                        #{coin.market_cap_rank || "N/A"}
+                      </td>
+                      <td style={styles.td}>
+                        ${coin.market_cap?.toLocaleString() || "N/A"}
+                      </td>
+                      <td
+                        style={{
+                          ...styles.td,
+                          color:
+                            coin.price_change_percentage_24h >= 0
+                              ? "#00ffab"
+                              : "#ff4d4f",
+                          fontWeight: 600,
+                        }}
+                      >
+                        {coin.price_change_percentage_24h !== undefined
+                          ? `${coin.price_change_percentage_24h >= 0 ? "↑" : "↓"} ${Math.abs(coin.price_change_percentage_24h).toFixed(2)}%`
+                          : "-"}
                       </td>
                     </tr>
                   ))}

@@ -28,7 +28,7 @@ const ScrollToTop = ({ lenis }) => {
       onClick={scrollToTop}
       aria-label="Scroll to top"
       className="
-        fixed bottom-4 sm:bottom-6 right-2 sm:right-6 z-50
+        fixed bottom-40 sm:bottom-32 right-2 sm:right-6 z-50
         rounded-full bg-cyan-300 text-black
         p-3 shadow-lg
         hover:bg-gray-800

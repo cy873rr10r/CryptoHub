@@ -1,11 +1,4 @@
-
-import React, {
-  useContext,
-  useState,
-  useEffect,
-  useMemo,
-  useCallback,
-} from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import AuthContext from "./AuthContext";
 import {
   createUserWithEmailAndPassword,
@@ -25,48 +18,42 @@ import {
 import { doc, setDoc, getDoc, updateDoc, serverTimestamp, deleteDoc } from "firebase/firestore";
 import { auth, db, googleProvider, isFirebaseConfigured } from "../firebase";
 
-
-
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
-  return context;
-};
-
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-
-  //   verify recent authentication 
-  const reauthenticateUser = useCallback(async (currentPassword) => {
-    if (!isFirebaseConfigured() || !auth || !currentUser) {
-      throw new Error(
-        "Firebase is not configured. Please add Firebase credentials to use authentication."
+  //   verify recent authentication
+  const reauthenticateUser = useCallback(
+    async (currentPassword) => {
+      if (!isFirebaseConfigured() || !auth || !currentUser) {
+        throw new Error(
+          "Firebase is not configured. Please add Firebase credentials to use authentication.",
+        );
+      }
+      const user = auth.currentUser;
+      // create credential with email and current password
+      const credentials = EmailAuthProvider.credential(
+        user.email,
+        currentPassword,
       );
-    }
-    const user = auth.currentUser;
-    // create credential with email and current password
-    const credentials = EmailAuthProvider.credential(user.email, currentPassword);
 
-    // Re-authenticate the user
-    await reauthenticateWithCredential(user, credentials);
-  }, [currentUser])
-
+      // Re-authenticate the user
+      await reauthenticateWithCredential(user, credentials);
+    },
+    [currentUser],
+  );
 
   // signup function
   const signup = useCallback(async (email, password, fullName) => {
     if (!isFirebaseConfigured() || !auth) {
       throw new Error(
-        "Firebase is not configured. Please add Firebase credentials to use authentication."
+        "Firebase is not configured. Please add Firebase credentials to use authentication.",
       );
     }
     const userCredential = await createUserWithEmailAndPassword(
       auth,
       email,
-      password
+      password,
     );
     const user = userCredential.user;
 
@@ -106,14 +93,14 @@ export const AuthProvider = ({ children }) => {
   const login = useCallback(async (email, password) => {
     if (!isFirebaseConfigured() || !auth) {
       throw new Error(
-        "Firebase is not configured. Please add Firebase credentials to use authentication."
+        "Firebase is not configured. Please add Firebase credentials to use authentication.",
       );
     }
     await setPersistence(auth, browserLocalPersistence);
     const userCredential = await signInWithEmailAndPassword(
       auth,
       email,
-      password
+      password,
     );
     return userCredential;
   }, []);
@@ -122,7 +109,7 @@ export const AuthProvider = ({ children }) => {
   const loginWithGoogle = useCallback(async () => {
     if (!isFirebaseConfigured() || !auth || !googleProvider) {
       throw new Error(
-        "Firebase is not configured. Please add Firebase credentials to use authentication."
+        "Firebase is not configured. Please add Firebase credentials to use authentication.",
       );
     }
     await setPersistence(auth, browserLocalPersistence);
@@ -164,24 +151,26 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   //   change Password function
-  const ChangePassword = useCallback(async (currentPassword, newPassword) => {
-    if (!isFirebaseConfigured() || !auth || !auth.currentUser) {
-      throw new Error('User  is Not Authenticated');
-    }
-    const user = auth.currentUser;
+  const ChangePassword = useCallback(
+    async (currentPassword, newPassword) => {
+      if (!isFirebaseConfigured() || !auth || !auth.currentUser) {
+        throw new Error("User  is Not Authenticated");
+      }
+      const user = auth.currentUser;
 
-    // re-authenticate user
-    await reauthenticateUser(currentPassword);
+      // re-authenticate user
+      await reauthenticateUser(currentPassword);
 
-    // update Password
-    await updatePassword(user, newPassword);
-
-  }, [reauthenticateUser]);
+      // update Password
+      await updatePassword(user, newPassword);
+    },
+    [reauthenticateUser],
+  );
 
   //   reload user and check verification status
   const reloadUserVerificationStatus = useCallback(async () => {
     if (!isFirebaseConfigured() || !auth?.currentUser) {
-      throw new Error('User is not authenticated');
+      throw new Error("User is not authenticated");
     }
     await auth.currentUser.reload();
     const user = auth.currentUser;
@@ -211,7 +200,7 @@ export const AuthProvider = ({ children }) => {
   const resetPassword = useCallback(async (email) => {
     if (!isFirebaseConfigured() || !auth) {
       throw new Error(
-        "Firebase is not configured. Please add Firebase credentials to use authentication."
+        "Firebase is not configured. Please add Firebase credentials to use authentication.",
       );
     }
     await sendPasswordResetEmail(auth, email);
@@ -247,7 +236,8 @@ export const AuthProvider = ({ children }) => {
 
     // check if user has email/password as a  provider
     return auth.currentUser?.providerData?.some(
-      (provider) => provider.providerId === 'password');
+      (provider) => provider.providerId === "password",
+    );
   }, []);
 
   //   delete unverified account if expired (> 24 hours)
@@ -320,12 +310,12 @@ export const AuthProvider = ({ children }) => {
             setCurrentUser({
               ...user,
               ...userData,
-              photoURL: userData.photoURL || user.photoURL
+              photoURL: userData.photoURL || user.photoURL,
             });
 
             // Initialize leaderboard entry if it doesn't exist (in background)
             const leaderboardDoc = await getDoc(
-              doc(db, "leaderboard", user.uid)
+              doc(db, "leaderboard", user.uid),
             );
             if (!leaderboardDoc.exists()) {
               await setDoc(doc(db, "leaderboard", user.uid), {
@@ -358,31 +348,35 @@ export const AuthProvider = ({ children }) => {
     // Handle Image Upload if file is provided
     if (imageFile) {
       try {
-
-
         // Step 1: Compress the image client-side using canvas (150x150 JPEG)
         const compressedBase64 = await new Promise((resolve, reject) => {
           const img = new Image();
           img.onload = () => {
             try {
-              const canvas = document.createElement('canvas');
+              const canvas = document.createElement("canvas");
               const MAX_SIZE = 150;
               let width = img.width;
               let height = img.height;
 
               if (width > height) {
-                if (width > MAX_SIZE) { height = Math.round(height * MAX_SIZE / width); width = MAX_SIZE; }
+                if (width > MAX_SIZE) {
+                  height = Math.round((height * MAX_SIZE) / width);
+                  width = MAX_SIZE;
+                }
               } else {
-                if (height > MAX_SIZE) { width = Math.round(width * MAX_SIZE / height); height = MAX_SIZE; }
+                if (height > MAX_SIZE) {
+                  width = Math.round((width * MAX_SIZE) / height);
+                  height = MAX_SIZE;
+                }
               }
 
               canvas.width = width;
               canvas.height = height;
-              const ctx = canvas.getContext('2d');
+              const ctx = canvas.getContext("2d");
               ctx.drawImage(img, 0, 0, width, height);
 
               // Convert to base64 JPEG (quality 0.7 = ~10-20KB)
-              const base64 = canvas.toDataURL('image/jpeg', 0.7);
+              const base64 = canvas.toDataURL("image/jpeg", 0.7);
 
               URL.revokeObjectURL(img.src); // Clean up
               resolve(base64);
@@ -401,10 +395,12 @@ export const AuthProvider = ({ children }) => {
         data.photoURL = photoURL;
         // Note: We store photoURL in Firestore only (not Firebase Auth)
         // because Auth's updateProfile rejects base64 strings
-
       } catch (error) {
         console.error("Error processing avatar:", error);
-        throw new Error("Failed to process profile picture: " + (error.message || "Unknown error"));
+        throw new Error(
+          "Failed to process profile picture: " +
+            (error.message || "Unknown error"),
+        );
       }
     }
 
@@ -417,7 +413,7 @@ export const AuthProvider = ({ children }) => {
       ...prev,
       ...data,
       photoURL: photoURL || prev.photoURL,
-      fullName: data.fullName || prev.fullName
+      fullName: data.fullName || prev.fullName,
     }));
 
     // If name or photo changed, update leaderboard too
@@ -450,7 +446,20 @@ export const AuthProvider = ({ children }) => {
       reloadUserVerificationStatus,
       updateUserProfile,
     }),
-    [currentUser, loading, signup, login, loginWithGoogle, logout, ChangePassword, resetPassword, isEmailProvider, sendVerificationEmail, reloadUserVerificationStatus, updateUserProfile]
+    [
+      currentUser,
+      loading,
+      signup,
+      login,
+      loginWithGoogle,
+      logout,
+      ChangePassword,
+      resetPassword,
+      isEmailProvider,
+      sendVerificationEmail,
+      reloadUserVerificationStatus,
+      updateUserProfile,
+    ],
   );
 
   return (
@@ -465,5 +474,3 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   );
 };
-
-
