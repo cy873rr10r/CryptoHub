@@ -1,0 +1,94 @@
+/* Wrapper */
+.terms-wrapper {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f172a, #111827);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 60px 20px;
+  font-family: 'Inter', sans-serif;
+  color: #e2e8f0;
+}
+
+/* Glass Card */
+.terms-card {
+  width: 100%;
+  max-width: 900px;
+  padding: 50px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+  transition: 0.4s ease;
+}
+
+/* Title */
+.main-title {
+  text-align: center;
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: #22d3ee;
+  margin-bottom: 8px;
+  letter-spacing: -1px;
+}
+
+.last-updated {
+  text-align: center;
+  color: #94a3b8;
+  margin-bottom: 45px;
+}
+
+/* Sections */
+.terms-section {
+  margin-bottom: 22px;
+  padding: 22px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid transparent;
+  transition: all 0.3s ease;
+}
+
+/* Smooth Professional Hover */
+.terms-section:hover {
+  background: rgba(34, 211, 238, 0.05);
+  border: 1px solid rgba(34, 211, 238, 0.3);
+  transform: translateY(-4px);
+}
+
+/* Section Title */
+.terms-section h2 {
+  color: #10b981;
+  margin-bottom: 10px;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+/* Content */
+.section-content {
+  color: #cbd5e1;
+  line-height: 1.7;
+  font-size: 0.95rem;
+}
+
+/* List */
+ul {
+  padding-left: 20px;
+}
+
+li {
+  margin-bottom: 6px;
+}
+
+/* Email */
+.email {
+  margin-top: 12px;
+  color: #22d3ee;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.email:hover {
+  color: #10b981;
+}

@@ -1,12 +1,13 @@
 import React, { useContext, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import "./Coin.css";
-import { CoinContext } from "../../../context/CoinContext";
-import LineChart from "../../../components/LineChart";
-import NewsPanel from "../../../components/NewsPanel";
+import { CoinContext } from "../../../context/CoinContextInstance";
+import LineChart from "../../../components/Dashboard/LineChart";
+import NewsPanel from "../../../components/Dashboard/NewsPanel";
 
 const Coin = () => {
   const { coinId } = useParams();
+  const navigate = useNavigate();
   const [coindata, setCoinData] = useState(null);
   const [historicaldata, setHistoricalData] = useState(null);
   const [coinLoading, setCoinLoading] = useState(true);
@@ -87,7 +88,7 @@ const Coin = () => {
         }
 
         const data = await response.json();
-        console.log("Historical data:", data);
+
         setHistoricalData(data);
         setHistoryLoading(false);
       } catch (err) {
@@ -140,6 +141,27 @@ const Coin = () => {
 
   return (
     <div className="coin">
+      {/* Back Button */}
+      <button
+        onClick={() => navigate(-1)}
+        style={{
+          margin: "16px 0",
+          padding: "10px 20px",
+          background: "#2563eb",
+          color: "#fff",
+          border: "none",
+          borderRadius: "6px",
+          cursor: "pointer",
+          fontWeight: "bold",
+          fontSize: "1rem",
+          boxShadow: "0 2px 8px rgba(37,99,235,0.08)",
+          transition: "background 0.2s"
+        }}
+        onMouseOver={e => (e.currentTarget.style.background = '#1d4ed8')}
+        onMouseOut={e => (e.currentTarget.style.background = '#2563eb')}
+      >
+        ← Back to Trending Coins
+      </button>
       <div data-aos="fade-right" className="coin-left">
         {/* Header Section with Logo and Name */}
         <div className="coin-header">

@@ -1,43 +1,55 @@
-import React, { useEffect, useContext,useRef } from "react";
-import Lenis from "@studio-freight/lenis";
-import Navbar from "@/components/Navbar";
+import React, { useEffect, useContext, useRef, useMemo } from "react";
+import Lenis from "lenis";
+import Navbar from "@/components/Layout/Navbar";
 import { Routes, Route, useLocation } from "react-router-dom";
 import Home from "@/pages/Home/Home";
 import CoinWrapper from "@/pages/Home/Coin/CoinWrapper";
-import Footer from "@/components/Footer";
-import Pricing from "@/components/Pricing";
-import Blog from "@/components/Blog";
-import Features from "@/components/Features";
-import Signup from "@/components/Signup";
-import Login from "@/components/Login";
-import BlogDetail from "@/components/BlogDetail";
+import Footer from "@/components/Layout/Footer";
+import Pricing from "@/components/Sections/Pricing";
+import Blog from "@/components/Sections/Blog";
+import Features from "@/components/Sections/Features";
+import Signup from "@/components/Auth/Signup";
+import Login from "@/components/Auth/Login";
+import EmailVerification from "@/components/Auth/EmailVerification";
+import BlogDetail from "@/components/Sections/BlogDetail";
 import DashboardLayout from "@/pages/Dashboard/DashboardLayout";
 import DashboardContent from "@/pages/Dashboard/DashboardContent";
 import MarketOverview from "@/pages/Dashboard/MarketOverview";
-import Leaderboard from "@/components/Leaderboard";
-import ChangePassword from "@/components/ChangePassword";
-import ForgotPassword from "@/components/ForgotPassword";
-import PrivateRoute from "@/components/PrivateRoute";
-import { AuthProvider } from "@/context/AuthContext";
+import Leaderboard from "@/components/Dashboard/Leaderboard";
+import ChangePassword from "@/components/Auth/ChangePassword";
+import SavedInsights from "@/pages/SavedInsights";
+import Profile from "@/pages/Dashboard/Profile";
+import ForgotPassword from "@/components/Auth/ForgotPassword";
+import PrivateRoute from "@/components/Auth/PrivateRoute";
+import { AuthProvider } from "@/context/AuthProvider";
 import { ThemeProvider } from "@/context/ThemeContext";
-import Contributors from "@/components/Contributors";
+import Contributors from "@/components/Sections/Contributors";
 import AOS from "aos";
 import "aos/dist/aos.css";
-import { CoinContext } from "@/context/CoinContext";
-import LoadingSpinner from "@/components/LoadingSpinner";
+import { CoinContext } from "@/context/CoinContextInstance";
+import LoadingSpinner from "@/components/Common/LoadingSpinner";
 import { Toaster } from "react-hot-toast";
-import ScrollToTop from "@/components/ScrollToTop";
-import PrivacyPolicy from "@/components/PrivacyPolicy.jsx";
-import TermsOfService from "@/components/TermsOfService.jsx";
-import CookiePolicy from "@/components/CookiePolicy.jsx";
+import ScrollToTop from "@/components/Layout/ScrollToTop";
+import PrivacyPolicy from "@/components/Legal/PrivacyPolicy.jsx";
+import TermsOfService from "@/components/Legal/TermsOfService.jsx";
+import CookiePolicy from "@/components/Legal/CookiePolicy.jsx";
 import "./App.css";
-import ContactUs from "./components/ContactUs";
-import FAQ from "./components/FAQ";
-import PageNotFound from "./components/PageNotFound";
+import ContactUs from "@/components/Sections/ContactUs";
+import FAQ from "@/components/Sections/FAQ";
+import PageNotFound from "@/components/Common/PageNotFound";
+import About from "@/components/Sections/About";
+import CryptoChatbot from "./CryptoChatbot/CryptoChatbot";
+import Feedback from "./pages/Feedback";
+import TrendingCoins from "@/pages/TrendingCoins";
+import NewListings from "@/pages/NewListings";
+import TopLosers from "@/pages/TopLosers";
+import ApiAccess from "@/pages/ApiAccess";
 
 const App = () => {
+  const lenisRef = useRef(null);
+  const { isLoading } = useContext(CoinContext);
+  const location = useLocation();
 
-  const lenisRef = useRef(null)
   useEffect(() => {
     const lenis = new Lenis({
       smoothWheel: true,
@@ -48,28 +60,40 @@ const App = () => {
 
     lenisRef.current = lenis;
 
-    function raf(time) {
-      lenis.raf(time);
-      requestAnimationFrame(raf);
-    }
+    let animationFrameId;
 
-    requestAnimationFrame(raf);
+    const raf = (time) => {
+      lenis.raf(time);
+      animationFrameId = requestAnimationFrame(raf);
+    };
+
+    animationFrameId = requestAnimationFrame(raf);
 
     return () => {
+      cancelAnimationFrame(animationFrameId);
       lenis.destroy();
       lenisRef.current = null;
     };
   }, []);
 
-  const { isLoading } = useContext(CoinContext);
-  const location = useLocation();
-  const isDashboard =
-    location.pathname === "/dashboard" ||
-    location.pathname === "/leaderboard" ||
-    location.pathname === "/market-overview" ||
-    location.pathname === "/change-password" ;
+  const dashboardRoutes = useMemo(
+    () => [
+      "/dashboard",
+      "/leaderboard",
+      "/market-overview",
+      "/change-password",
+      "/saved-insights",
+      "/profile",
+    ],
+    []
+  );
 
-  const authRoutes = ["/login", "/signup", "/forgot-password"];
+  const authRoutes = useMemo(
+    () => ["/login", "/signup", "/forgot-password", "/verify-email"],
+    []
+  );
+
+  const isDashboard = dashboardRoutes.includes(location.pathname);
   const isAuthPage = authRoutes.includes(location.pathname);
 
   useEffect(() => {
@@ -108,9 +132,7 @@ const App = () => {
       <ThemeProvider>
         <AuthProvider>
           <div className="app">
-            {/* Loading Spinner - will show when isLoading is true */}
             {isLoading && !isDashboard && <LoadingSpinner />}
-
             <div
               className={
                 isDashboard ? "app-dashboard-container" : "app-container"
@@ -121,17 +143,26 @@ const App = () => {
                 <Route path="/" element={<Home />} />
                 <Route path="/pricing" element={<Pricing />} />
                 <Route path="/blog" element={<Blog />} />
-                {/* Blog detail route supporting both slug and id patterns */}
                 <Route path="/blog/:slug" element={<BlogDetail />} />
                 <Route path="/blog/article/:id" element={<BlogDetail />} />
+                <Route path="/trending" element={<TrendingCoins />} />
+                <Route path="/new-listings" element={<NewListings />} />
+                <Route path="/top-losers" element={<TopLosers />} />
+                <Route path="/api-access" element={<ApiAccess />} />
 
                 <Route path="/features" element={<Features />} />
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route
+                  path="/verify-email"
+                  element={
+                    <PrivateRoute>
+                      <EmailVerification />
+                    </PrivateRoute>
+                  }
+                />
                 <Route path="/contributors" element={<Contributors />} />
-
-                {/* Dashboard Layout with nested routes - all share the same sidebar */}
                 <Route
                   element={
                     <PrivateRoute requireEmailVerification={true}>
@@ -140,33 +171,36 @@ const App = () => {
                   }
                 >
                   <Route path="/dashboard" element={<DashboardContent />} />
-                  <Route path="/market-overview" element={<MarketOverview />} />
+                  <Route
+                    path="/market-overview"
+                    element={<MarketOverview />}
+                  />
                   <Route path="/leaderboard" element={<Leaderboard />} />
-                  <Route path="/change-password" element={<ChangePassword />} />
+                  <Route
+                    path="/change-password"
+                    element={<ChangePassword />}
+                  />
+                  <Route
+                    path="/saved-insights"
+                    element={<SavedInsights />}
+                  />
+                  <Route path="/profile" element={<Profile />} />
                 </Route>
-
-                {/* Coin route - accessible to all but shows sidebar if logged in */}
                 <Route path="/coin/:coinId" element={<CoinWrapper />} />
-
-                {/* Add 404 Route if you implemented it earlier */}
-                {/* <Route path="*" element={<NotFound />} /> */}
-
                 <Route path="/privacy" element={<PrivacyPolicy />} />
                 <Route path="/terms" element={<TermsOfService />} />
                 <Route path="/contactus" element={<ContactUs />} />
                 <Route path="/faq" element={<FAQ />} />
-
-                {/* Page Not Found */}
-                <Route path="*" element={<PageNotFound />} />
-
-
-
+                <Route path="/feedback" element={<Feedback />} />
+                <Route path="/about" element={<About />} />
                 <Route path="/cookies" element={<CookiePolicy />} />
+                <Route path="*" element={<PageNotFound />} />
               </Routes>
             </div>
-           {!isDashboard && !isAuthPage && <Footer />}
+            {!isDashboard && !isAuthPage && <Footer />}
           </div>
-          <ScrollToTop  lenis={lenisRef.current} />
+          <ScrollToTop lenis={lenisRef.current} />
+          <CryptoChatbot />
         </AuthProvider>
       </ThemeProvider>
     </>

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import LoadingSpinner from '../components/LoadingSpinner';
+import LoadingSpinner from '../components/Common/LoadingSpinner';
 
 const Callback = () => {
     const navigate = useNavigate();

@@ -4,7 +4,7 @@ import "./index.css";
 import App from "./App.jsx";
 import { BrowserRouter } from "react-router-dom";
 import { CoinContextProvider } from "./context/CoinContext";
-import { AuthProvider } from "./context/AuthContext";
+import { AuthProvider } from "./context/AuthProvider";
 import { ThemeProvider } from "./context/ThemeContext";
 import { LeaderboardProvider } from "./context/LeaderboardContext";
 import { HelmetProvider } from 'react-helmet-async';

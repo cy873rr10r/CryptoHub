@@ -1,0 +1,145 @@
+/* Signup.css - Fixed to work with existing Login.css */
+@import "./Login.css";
+
+/* Signup specific overrides */
+.signup-card {
+  max-width: 480px;
+  padding: 40px 35px !important; /* Override any existing padding */
+}
+
+/* Fix form spacing for signup  fields than login */
+.auth-form {
+  margin-top: 10px !important;
+}
+
+/* Fix terms checkbox alignment */
+.terms-checkbox {
+  display: flex;
+  align-items: flex-start; /* Changed from center */
+  gap: 10px;
+  margin: 15px 0 20px;
+  padding: 8px 0;
+  width: 100%;
+}
+
+.terms-checkbox input[type="checkbox"] {
+  margin-top: 3px; /* Align with first line of text */
+  width: 18px;
+  height: 18px;
+  accent-color: var(--neon-cyan);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.terms-checkbox label {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  cursor: pointer;
+  user-select: none;
+  text-align: left;
+}
+
+.terms-link {
+  color: var(--neon-cyan);
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.terms-link:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+
+/* Ensure proper spacing between form groups */
+.form-group {
+  margin-bottom: 20px !important;
+}
+
+/* Fix input icon position for signup */
+.input-with-icon {
+  position: relative;
+  width: 100%;
+}
+
+.input-icon {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  z-index: 10;
+}
+
+/* Adjust padding for inputs with icons */
+.auth-input {
+  padding-left: 45px !important; /* Ensure space for icon */
+  padding-right: 45px !important; /* Ensure space for toggle button */
+}
+
+/* Fix toggle password button positioning */
+.toggle-password {
+  position: absolute !important;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 1.1rem;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transition: color 0.2s;
+}
+
+.toggle-password:hover {
+  color: #fff;
+}
+
+/* Fix error message spacing */
+.error-message {
+  display: block;
+  color: #ff3366;
+  font-size: 0.8rem;
+  margin-top: 5px !important;
+  margin-left: 5px;
+  min-height: 20px; /* Reserve space to prevent layout shift */
+}
+
+/* Fix button spacing */
+.btn-neon-purple.w-full {
+  margin-top: 5px !important;
+  margin-bottom: 5px !important;
+}
+
+/* Fix divider spacing */
+.divider {
+  margin: 20px 0 !important;
+}
+
+/* Fix Google button spacing */
+.google-signin-btn {
+  margin-top: 5px !important;
+}
+
+/* Fix footer spacing */
+.auth-footer {
+  margin-top: 20px !important;
+}
+
+/* Responsive adjustments for signup */
+@media (max-width: 500px) {
+  .signup-card {
+    padding: 30px 20px !important;
+  }
+  
+  .terms-checkbox label {
+    font-size: 0.85rem;
+  }
+}
