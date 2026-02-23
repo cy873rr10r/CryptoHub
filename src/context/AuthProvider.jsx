@@ -178,18 +178,6 @@ export const AuthProvider = ({ children }) => {
 
   }, [reauthenticateUser]);
 
-  //   send email verification
-  const sendVerificationEmail = useCallback(async () => {
-    if (!isFirebaseConfigured() || !auth?.currentUser) {
-      throw new Error('User is not authenticated');
-    }
-
-    await sendEmailVerification(auth.currentUser, {
-      url: window.location.origin + '/dashboard',
-      handleCodeInApp: false,
-    });
-  }, []);
-
   //   reload user and check verification status
   const reloadUserVerificationStatus = useCallback(async () => {
     if (!isFirebaseConfigured() || !auth?.currentUser) {
@@ -329,7 +317,6 @@ export const AuthProvider = ({ children }) => {
             
             console.log("Fetched user data from Firestore:", userData);
             // Update user with ALL Firestore data so profile fields persist
->>>>>>> origin/main:src/context/AuthProvider.jsx
             setCurrentUser({
               ...user,
               ...userData,

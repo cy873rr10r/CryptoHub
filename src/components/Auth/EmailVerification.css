@@ -4,16 +4,16 @@
   align-items: center;
   justify-content: center;
   padding: 2rem 1rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: transparent;
 }
 
 .email-verification-container {
-  background: white;
+  background: transparent;
   border-radius: 1rem;
   padding: 3rem 2rem;
   max-width: 500px;
   width: 100%;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  box-shadow: none;
   text-align: center;
   animation: slideUp 0.5s ease-out;
 }
@@ -30,42 +30,43 @@
 }
 
 .email-verification-icon {
-  width: 80px;
-  height: 80px;
+  width: 120px;
+  height: 120px;
   margin: 0 auto 1.5rem;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2.5rem;
+  font-size: 3.5rem;
   color: white;
+  padding: 20px;
 }
 
 .email-verification-title {
   font-size: 1.875rem;
   font-weight: 700;
-  color: #1a202c;
+  color: #ffffff;
   margin-bottom: 1rem;
 }
 
 .email-verification-message {
   font-size: 1rem;
-  color: #4a5568;
+  color: #ffffff;
   margin-bottom: 0.5rem;
 }
 
 .email-verification-email {
   font-size: 1.125rem;
   font-weight: 600;
-  color: #667eea;
+  color: #00f3ff;
   margin-bottom: 1.5rem;
   word-break: break-word;
 }
 
 .email-verification-instructions {
   font-size: 0.9375rem;
-  color: #718096;
+  color: #ffffff;
   line-height: 1.6;
   margin-bottom: 2rem;
   padding: 0 1rem;
@@ -136,7 +137,7 @@
 .btn-text {
   background: none;
   border: none;
-  color: #667eea;
+  color: #ffffff;
   font-size: 0.875rem;
   cursor: pointer;
   padding: 0.5rem;
@@ -144,12 +145,12 @@
 }
 
 .btn-text:hover {
-  color: #764ba2;
-  text-decoration: underline;
+  color: #00f3ff;
+  text-decoration: none;
 }
 
 .email-verification-footer {
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
   padding-top: 1.5rem;
   display: flex;
   flex-direction: column;
@@ -158,11 +159,11 @@
 
 .email-verification-help {
   font-size: 0.875rem;
-  color: #718096;
+  color: #ffffff;
 }
 
 .email-verification-help a {
-  color: #667eea;
+  color: #00f3ff;
   text-decoration: none;
   font-weight: 600;
 }

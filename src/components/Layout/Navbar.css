@@ -220,6 +220,15 @@
   position: relative;
   padding: 0;
   animation: navItemFadeIn 0.5s var(--transition-smooth) 0.1s forwards;
+  white-space: nowrap;
+  overflow: visible;
+  min-width: fit-content;
+}
+
+.logo-text {
+  display: inline-block;
+  white-space: nowrap;
+  overflow: visible;
 }
 
 .navbar-logo:hover {

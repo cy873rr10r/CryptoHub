@@ -87,29 +87,11 @@ function EmailVerification() {
           Please check your <strong>inbox</strong> (and <strong>spam/junk folder</strong>) and click the verification link to activate your account.
         </p>
         
-        <p className="email-verification-warning" style={{ color: '#fbbf24', fontSize: '14px', marginTop: '12px' }}>
+        <p className="email-verification-warning" style={{ color: '#fbbf24', fontSize: '14px', marginTop: '12px', marginBottom: '32px' }}>
           ⏰ Verification link expires in 24 hours. Unverified accounts will be automatically deleted after 24 hours.
         </p>
         
         <div className="email-verification-actions">
-          <button
-            onClick={handleCheckVerification}
-            disabled={checkingStatus}
-            className="btn-primary email-verification-btn"
-          >
-            {checkingStatus ? (
-              <>
-                <FiRefreshCw className="spinning" />
-                Checking...
-              </>
-            ) : (
-              <>
-                <FiCheckCircle />
-                I've Verified My Email
-              </>
-            )}
-          </button>
-          
           <button
             onClick={handleResendEmail}
             disabled={loading}
@@ -127,6 +109,26 @@ function EmailVerification() {
               </>
             )}
           </button>
+          
+          <a 
+            href="/"
+            style={{
+              marginTop: '12px',
+              marginBottom: '16px',
+              padding: '12px 24px',
+              backgroundColor: '#8b5cf6',
+              color: '#fff',
+              textDecoration: 'none',
+              borderRadius: '8px',
+              fontWeight: '600',
+              transition: 'all 0.3s ease',
+              display: 'inline-block'
+            }}
+            onMouseEnter={(e) => e.target.style.backgroundColor = '#7c3aed'}
+            onMouseLeave={(e) => e.target.style.backgroundColor = '#8b5cf6'}
+          >
+            Go to Home Page
+          </a>
         </div>
         
         <div className="email-verification-footer">
